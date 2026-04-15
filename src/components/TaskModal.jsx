@@ -31,6 +31,14 @@ export default function TaskModal({ task, allTags, onSave, onClose }) {
     setTagInput('')
   }, [task])
 
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
   function handleSubmit(e) {
     e.preventDefault()
     if (!form.title.trim()) return
