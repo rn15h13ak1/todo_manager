@@ -3,15 +3,18 @@ import { loadTasks, saveTasks } from '../utils/storage'
 
 const PRIORITY_ORDER = { high: 1, medium: 2, low: 3 }
 
+export const INITIAL_FILTERS = {
+  status: 'not_done',
+  priority: 'all',
+  tag: 'all',
+  overdueOnly: false,
+}
+export const INITIAL_SORT_KEY = 'dueDate_asc'
+
 export function useTasks() {
   const [tasks, setTasks] = useState(() => loadTasks())
-  const [filters, setFilters] = useState({
-    status: 'not_done',
-    priority: 'all',
-    tag: 'all',
-    overdueOnly: false,
-  })
-  const [sortKey, setSortKey] = useState('dueDate_asc')
+  const [filters, setFilters] = useState(INITIAL_FILTERS)
+  const [sortKey, setSortKey] = useState(INITIAL_SORT_KEY)
 
   useEffect(() => {
     saveTasks(tasks)
@@ -66,6 +69,11 @@ export function useTasks() {
     setTasks(imported)
   }
 
+  function resetFilters() {
+    setFilters(INITIAL_FILTERS)
+    setSortKey(INITIAL_SORT_KEY)
+  }
+
   const today = new Date().toISOString().slice(0, 10)
 
   const allTags = useMemo(() => {
@@ -107,6 +115,13 @@ export function useTasks() {
     })
   }, [tasks, filters, sortKey, today])
 
+  const isFiltered =
+    filters.status !== INITIAL_FILTERS.status ||
+    filters.priority !== INITIAL_FILTERS.priority ||
+    filters.tag !== INITIAL_FILTERS.tag ||
+    filters.overdueOnly !== INITIAL_FILTERS.overdueOnly ||
+    sortKey !== INITIAL_SORT_KEY
+
   return {
     tasks,
     filteredTasks,
@@ -115,6 +130,8 @@ export function useTasks() {
     setFilters,
     sortKey,
     setSortKey,
+    isFiltered,
+    resetFilters,
     addTask,
     updateTask,
     deleteTask,

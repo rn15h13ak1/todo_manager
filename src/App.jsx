@@ -21,6 +21,8 @@ export default function App() {
     allTags,
     addTagToTasks,
     removeTagFromTasks,
+    isFiltered,
+    resetFilters,
   } = useTasks()
 
   // null = closed, { task: null } = add mode, { task: Task } = edit mode
@@ -44,6 +46,8 @@ export default function App() {
         sortKey={sortKey}
         setSortKey={setSortKey}
         allTags={allTags}
+        isFiltered={isFiltered}
+        onReset={resetFilters}
       />
       <TaskList
         tasks={filteredTasks}

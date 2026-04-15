@@ -1,4 +1,4 @@
-export default function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags }) {
+export default function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags, isFiltered, onReset }) {
   return (
     <div className="bg-white border-b border-gray-200">
       <div className="max-w-4xl mx-auto px-4 py-3 flex flex-wrap gap-4 items-center">
@@ -68,6 +68,15 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
           />
           期限切れのみ
         </label>
+
+        {isFiltered && (
+          <button
+            onClick={onReset}
+            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 border border-gray-300 hover:border-gray-400 rounded-md px-2.5 py-1 transition-colors"
+          >
+            ✕ フィルターをリセット
+          </button>
+        )}
       </div>
     </div>
   )
