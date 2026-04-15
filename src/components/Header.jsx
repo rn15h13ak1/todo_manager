@@ -7,6 +7,7 @@ export default function Header({ onAdd }) {
         <div className="flex items-center gap-2">
           <ClipboardList className="text-blue-600" size={24} />
           <h1 className="text-xl font-bold text-gray-800">todo-manager</h1>
+          <span className="text-xs text-gray-400 font-mono">v{__APP_VERSION__}</span>
         </div>
         <button
           onClick={onAdd}

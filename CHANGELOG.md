@@ -1,0 +1,24 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0] - 2026-04-15
+
+### Added
+- タスクの CRUD（追加・編集・削除）
+- タスクデータ構造：タイトル・説明・期限日・優先度・ステータス・作成日時
+- ステータスフィルター（すべて / 未着手 / 進行中 / 完了）
+- 優先度フィルター（すべて / 高 / 中 / 低）
+- 期限切れフィルター（今日以前の未完了タスク）
+- ソート（期限日昇順・降順 / 優先度 / 作成日）
+- 期限切れタスクの視覚的強調（赤ボーダー・赤テキスト）
+- localStorage による自動保存・自動読み込み
+- JSON インポート（.json ファイルからタスクを復元）
+- JSON エクスポート（`todo-manager_yyyymmdd_hhmmss.json`）
+- HTML エクスポート（`todo-manager_yyyymmdd_hhmmss.html`）
+- 削除時の確認ダイアログ（タスク名入り）
+- 編集・削除ボタンの間隔調整（誤クリック防止）
+- ヘッダーへのバージョン表示
+- Vite + vite-plugin-singlefile による単一 HTML ファイルビルド
