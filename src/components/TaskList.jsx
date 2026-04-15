@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { FileDown, FileUp, Trash2, Tag } from 'lucide-react'
+import { FileDown, FileUp, Trash2, Tag, X } from 'lucide-react'
 import TaskCard from './TaskCard'
 import BulkTagModal from './BulkTagModal'
 import { exportJson } from '../utils/exportJson'
@@ -34,7 +34,7 @@ export default function TaskList({
   }
 
   function toggleAll() {
-    setSelectedIds(selectedIds.length === tasks.length ? [] : tasks.map((t) => t.id))
+    setSelectedIds(selectedIds.length > 0 ? [] : tasks.map((t) => t.id))
   }
 
   function handleDeleteSelected() {
@@ -81,16 +81,28 @@ export default function TaskList({
         <>
           {/* 一括操作バー */}
           <div className="flex items-center justify-between mb-3 px-1 flex-wrap gap-2">
-            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={allChecked}
-                ref={(el) => { if (el) el.indeterminate = someChecked }}
-                onChange={toggleAll}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 cursor-pointer"
-              />
-              {selectedIds.length > 0 ? `${selectedIds.length} 件を選択中` : '全て選択'}
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={allChecked}
+                  ref={(el) => { if (el) el.indeterminate = someChecked }}
+                  onChange={toggleAll}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 cursor-pointer"
+                />
+                {selectedIds.length > 0 ? `${selectedIds.length} 件を選択中` : '全て選択'}
+              </label>
+              {selectedIds.length > 0 && (
+                <button
+                  onClick={() => setSelectedIds([])}
+                  className="flex items-center gap-0.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                  title="選択を解除"
+                >
+                  <X size={13} />
+                  解除
+                </button>
+              )}
+            </div>
             {selectedIds.length > 0 && (
               <div className="flex gap-2">
                 <button
