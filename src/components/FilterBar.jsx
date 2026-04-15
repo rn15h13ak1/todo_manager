@@ -1,4 +1,4 @@
-export default function FilterBar({ filters, setFilters, sortKey, setSortKey }) {
+export default function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags }) {
   return (
     <div className="bg-white border-b border-gray-200">
       <div className="max-w-4xl mx-auto px-4 py-3 flex flex-wrap gap-4 items-center">
@@ -28,6 +28,20 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey }) 
             <option value="high">高</option>
             <option value="medium">中</option>
             <option value="low">低</option>
+          </select>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-600 whitespace-nowrap">タグ</label>
+          <select
+            value={filters.tag}
+            onChange={(e) => setFilters((f) => ({ ...f, tag: e.target.value }))}
+            className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="all">すべて</option>
+            {allTags.map((tag) => (
+              <option key={tag} value={tag}>{tag}</option>
+            ))}
           </select>
         </div>
 

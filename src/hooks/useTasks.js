@@ -8,6 +8,7 @@ export function useTasks() {
   const [filters, setFilters] = useState({
     status: 'not_done',
     priority: 'all',
+    tag: 'all',
     overdueOnly: false,
   })
   const [sortKey, setSortKey] = useState('dueDate_asc')
@@ -18,6 +19,7 @@ export function useTasks() {
 
   function addTask(formData) {
     const task = {
+      tags: [],
       ...formData,
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
@@ -38,11 +40,39 @@ export function useTasks() {
     setTasks((prev) => prev.filter((t) => !idSet.has(t.id)))
   }
 
+  function addTagToTasks(ids, tag) {
+    const idSet = new Set(ids)
+    setTasks((prev) =>
+      prev.map((t) =>
+        idSet.has(t.id) && !(t.tags || []).includes(tag)
+          ? { ...t, tags: [...(t.tags || []), tag] }
+          : t
+      )
+    )
+  }
+
+  function removeTagFromTasks(ids, tag) {
+    const idSet = new Set(ids)
+    setTasks((prev) =>
+      prev.map((t) =>
+        idSet.has(t.id)
+          ? { ...t, tags: (t.tags || []).filter((tg) => tg !== tag) }
+          : t
+      )
+    )
+  }
+
   function importTasks(imported) {
     setTasks(imported)
   }
 
   const today = new Date().toISOString().slice(0, 10)
+
+  const allTags = useMemo(() => {
+    const tagSet = new Set()
+    tasks.forEach((t) => (t.tags || []).forEach((tag) => tagSet.add(tag)))
+    return [...tagSet].sort()
+  }, [tasks])
 
   const filteredTasks = useMemo(() => {
     let result = tasks
@@ -54,6 +84,9 @@ export function useTasks() {
     }
     if (filters.priority !== 'all') {
       result = result.filter((t) => t.priority === filters.priority)
+    }
+    if (filters.tag !== 'all') {
+      result = result.filter((t) => (t.tags || []).includes(filters.tag))
     }
     if (filters.overdueOnly) {
       result = result.filter(
@@ -77,6 +110,7 @@ export function useTasks() {
   return {
     tasks,
     filteredTasks,
+    allTags,
     filters,
     setFilters,
     sortKey,
@@ -85,6 +119,8 @@ export function useTasks() {
     updateTask,
     deleteTask,
     deleteTasks,
+    addTagToTasks,
+    removeTagFromTasks,
     importTasks,
   }
 }

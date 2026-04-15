@@ -1,4 +1,5 @@
 import { Pencil, Trash2 } from 'lucide-react'
+import { tagColor } from '../utils/tags'
 
 const PRIORITY_BADGE = {
   high: 'bg-red-100 text-red-700',
@@ -50,6 +51,19 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete })
 
         {task.description && (
           <p className="text-sm text-gray-500 leading-relaxed">{task.description}</p>
+        )}
+
+        {(task.tags || []).length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {task.tags.map((tag) => (
+              <span
+                key={tag}
+                className={`text-xs px-2 py-0.5 rounded-full font-medium ${tagColor(tag)}`}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         )}
 
         <div className="flex items-center justify-between mt-1">

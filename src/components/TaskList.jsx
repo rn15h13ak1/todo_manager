@@ -1,12 +1,24 @@
 import { useRef, useState } from 'react'
-import { FileDown, FileUp, Trash2 } from 'lucide-react'
+import { FileDown, FileUp, Trash2, Tag } from 'lucide-react'
 import TaskCard from './TaskCard'
+import BulkTagModal from './BulkTagModal'
 import { exportJson } from '../utils/exportJson'
 import { exportHtml } from '../utils/exportHtml'
 
-export default function TaskList({ tasks, allTasks, onEdit, onDelete, onDeleteMany, onImport }) {
+export default function TaskList({
+  tasks,
+  allTasks,
+  allTags,
+  onEdit,
+  onDelete,
+  onDeleteMany,
+  onAddTagToMany,
+  onRemoveTagFromMany,
+  onImport,
+}) {
   const fileInputRef = useRef(null)
   const [selectedIds, setSelectedIds] = useState([])
+  const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
 
   // フィルター結果が変わったとき、表示外のIDを選択から除外
   const visibleIds = new Set(tasks.map((t) => t.id))
@@ -22,15 +34,18 @@ export default function TaskList({ tasks, allTasks, onEdit, onDelete, onDeleteMa
   }
 
   function toggleAll() {
-    setSelectedIds(
-      selectedIds.length === tasks.length ? [] : tasks.map((t) => t.id)
-    )
+    setSelectedIds(selectedIds.length === tasks.length ? [] : tasks.map((t) => t.id))
   }
 
   function handleDeleteSelected() {
     if (!window.confirm(`選択した ${selectedIds.length} 件のタスクを削除しますか？`)) return
     onDeleteMany(selectedIds)
     setSelectedIds([])
+  }
+
+  function handleBulkTagApply(tag) {
+    if (bulkTagMode === 'add') onAddTagToMany(selectedIds, tag)
+    else onRemoveTagFromMany(selectedIds, tag)
   }
 
   function handleImport(e) {
@@ -54,6 +69,7 @@ export default function TaskList({ tasks, allTasks, onEdit, onDelete, onDeleteMa
 
   const allChecked = tasks.length > 0 && selectedIds.length === tasks.length
   const someChecked = selectedIds.length > 0 && selectedIds.length < tasks.length
+  const selectedTasks = tasks.filter((t) => selectedIds.includes(t.id))
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-6">
@@ -64,7 +80,7 @@ export default function TaskList({ tasks, allTasks, onEdit, onDelete, onDeleteMa
       ) : (
         <>
           {/* 一括操作バー */}
-          <div className="flex items-center justify-between mb-3 px-1">
+          <div className="flex items-center justify-between mb-3 px-1 flex-wrap gap-2">
             <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -76,13 +92,29 @@ export default function TaskList({ tasks, allTasks, onEdit, onDelete, onDeleteMa
               {selectedIds.length > 0 ? `${selectedIds.length} 件を選択中` : '全て選択'}
             </label>
             {selectedIds.length > 0 && (
-              <button
-                onClick={handleDeleteSelected}
-                className="flex items-center gap-1.5 text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg transition-colors"
-              >
-                <Trash2 size={14} />
-                {selectedIds.length} 件を削除
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setBulkTagMode('add')}
+                  className="flex items-center gap-1.5 text-sm text-white bg-purple-500 hover:bg-purple-600 px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  <Tag size={14} />
+                  タグを追加
+                </button>
+                <button
+                  onClick={() => setBulkTagMode('remove')}
+                  className="flex items-center gap-1.5 text-sm text-purple-600 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  <Tag size={14} />
+                  タグを削除
+                </button>
+                <button
+                  onClick={handleDeleteSelected}
+                  className="flex items-center gap-1.5 text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  <Trash2 size={14} />
+                  {selectedIds.length} 件を削除
+                </button>
+              </div>
             )}
           </div>
 
@@ -136,6 +168,16 @@ export default function TaskList({ tasks, allTasks, onEdit, onDelete, onDeleteMa
           HTMLでエクスポート
         </button>
       </div>
+
+      {bulkTagMode && (
+        <BulkTagModal
+          mode={bulkTagMode}
+          selectedTasks={selectedTasks}
+          allTags={allTags}
+          onApply={handleBulkTagApply}
+          onClose={() => setBulkTagMode(null)}
+        />
+      )}
     </main>
   )
 }

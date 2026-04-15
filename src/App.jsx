@@ -18,6 +18,9 @@ export default function App() {
     deleteTask,
     deleteTasks,
     importTasks,
+    allTags,
+    addTagToTasks,
+    removeTagFromTasks,
   } = useTasks()
 
   // null = closed, { task: null } = add mode, { task: Task } = edit mode
@@ -40,18 +43,23 @@ export default function App() {
         setFilters={setFilters}
         sortKey={sortKey}
         setSortKey={setSortKey}
+        allTags={allTags}
       />
       <TaskList
         tasks={filteredTasks}
         allTasks={tasks}
+        allTags={allTags}
         onEdit={(task) => setModalState({ task })}
         onDelete={deleteTask}
         onDeleteMany={deleteTasks}
+        onAddTagToMany={addTagToTasks}
+        onRemoveTagFromMany={removeTagFromTasks}
         onImport={importTasks}
       />
       {modalState !== null && (
         <TaskModal
           task={modalState.task}
+          allTags={allTags}
           onSave={handleSave}
           onClose={() => setModalState(null)}
         />

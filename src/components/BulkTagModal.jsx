@@ -1,0 +1,115 @@
+import { useState } from 'react'
+import { X, Plus } from 'lucide-react'
+import { tagColor } from '../utils/tags'
+
+export default function BulkTagModal({ mode, selectedTasks, allTags, onApply, onClose }) {
+  const [input, setInput] = useState('')
+
+  // 削除モード: 選択タスクが持つタグの和集合
+  const removableTags = [...new Set(selectedTasks.flatMap((t) => t.tags || []))]
+
+  // 追加モード: まだ全タスクに付いていないタグをサジェスト
+  const suggestedTags = allTags.filter((t) => t.includes(input))
+
+  function handleAdd() {
+    const tag = input.trim()
+    if (!tag) return
+    onApply(tag)
+    onClose()
+  }
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h2 className="text-base font-semibold text-gray-800">
+            {mode === 'add' ? `タグを一括追加（${selectedTasks.length}件）` : `タグを一括削除（${selectedTasks.length}件）`}
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="px-6 py-5 flex flex-col gap-4">
+          {mode === 'add' ? (
+            <>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAdd() } }}
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="タグ名を入力"
+                  autoFocus
+                />
+                <button
+                  onClick={handleAdd}
+                  disabled={!input.trim()}
+                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm disabled:opacity-40 transition-colors"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+              {suggestedTags.length > 0 && (
+                <div>
+                  <p className="text-xs text-gray-400 mb-1.5">既存のタグから選択</p>
+                  <div className="flex flex-wrap gap-1">
+                    {suggestedTags.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => { onApply(tag); onClose() }}
+                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${tagColor(tag)} hover:opacity-80 transition-opacity`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button
+                onClick={onClose}
+                className="w-full border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm transition-colors"
+              >
+                キャンセル
+              </button>
+            </>
+          ) : (
+            <>
+              {removableTags.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  選択したタスクにタグがありません
+                </p>
+              ) : (
+                <div>
+                  <p className="text-xs text-gray-400 mb-2">削除するタグを選択</p>
+                  <div className="flex flex-wrap gap-2">
+                    {removableTags.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => { onApply(tag); onClose() }}
+                        className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${tagColor(tag)} hover:opacity-80 transition-opacity`}
+                      >
+                        {tag}
+                        <X size={10} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button
+                onClick={onClose}
+                className="w-full border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm transition-colors"
+              >
+                キャンセル
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
