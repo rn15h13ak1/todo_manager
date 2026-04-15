@@ -6,7 +6,7 @@ const PRIORITY_ORDER = { high: 1, medium: 2, low: 3 }
 export function useTasks() {
   const [tasks, setTasks] = useState(() => loadTasks())
   const [filters, setFilters] = useState({
-    status: 'all',
+    status: 'not_done',
     priority: 'all',
     overdueOnly: false,
   })
