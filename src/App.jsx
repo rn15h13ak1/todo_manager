@@ -28,11 +28,20 @@ export default function App() {
   // null = closed, { task: null } = add mode, { task: Task } = edit mode
   const [modalState, setModalState] = useState(null)
 
-  // ESC キーでフィルターリセット（モーダルが閉じているときのみ）
+  // キーボードショートカット
   useEffect(() => {
     function handleKeyDown(e) {
+      const tag = document.activeElement?.tagName
+      const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+
+      // ESC: フィルターリセット（モーダルが閉じているときのみ）
       if (e.key === 'Escape' && modalState === null && isFiltered) {
         resetFilters()
+      }
+
+      // n: タスク追加モーダルを開く（入力中・モーダル表示中は無効）
+      if (e.key === 'n' && !isTyping && modalState === null) {
+        setModalState({ task: null })
       }
     }
     document.addEventListener('keydown', handleKeyDown)
