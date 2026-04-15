@@ -39,6 +39,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <div className="sticky top-0 z-10">
       <Header onAdd={() => setModalState({ task: null })} />
       <FilterBar
         filters={filters}
@@ -49,6 +50,7 @@ export default function App() {
         isFiltered={isFiltered}
         onReset={resetFilters}
       />
+      </div>
       <TaskList
         tasks={filteredTasks}
         allTasks={tasks}
