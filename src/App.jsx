@@ -41,6 +41,7 @@ export default function App() {
 
       // n: タスク追加モーダルを開く（入力中・モーダル表示中は無効）
       if (e.key === 'n' && !isTyping && modalState === null) {
+        e.preventDefault()
         setModalState({ task: null })
       }
     }
