@@ -16,6 +16,7 @@ export default function App() {
     addTask,
     updateTask,
     deleteTask,
+    deleteTasks,
     importTasks,
   } = useTasks()
 
@@ -45,6 +46,7 @@ export default function App() {
         allTasks={tasks}
         onEdit={(task) => setModalState({ task })}
         onDelete={deleteTask}
+        onDeleteMany={deleteTasks}
         onImport={importTasks}
       />
       {modalState !== null && (

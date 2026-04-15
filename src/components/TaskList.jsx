@@ -1,11 +1,37 @@
-import { useRef } from 'react'
-import { FileDown, FileUp } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { FileDown, FileUp, Trash2 } from 'lucide-react'
 import TaskCard from './TaskCard'
 import { exportJson } from '../utils/exportJson'
 import { exportHtml } from '../utils/exportHtml'
 
-export default function TaskList({ tasks, allTasks, onEdit, onDelete, onImport }) {
+export default function TaskList({ tasks, allTasks, onEdit, onDelete, onDeleteMany, onImport }) {
   const fileInputRef = useRef(null)
+  const [selectedIds, setSelectedIds] = useState([])
+
+  // フィルター結果が変わったとき、表示外のIDを選択から除外
+  const visibleIds = new Set(tasks.map((t) => t.id))
+  const validSelected = selectedIds.filter((id) => visibleIds.has(id))
+  if (validSelected.length !== selectedIds.length) {
+    setSelectedIds(validSelected)
+  }
+
+  function toggleOne(id) {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    )
+  }
+
+  function toggleAll() {
+    setSelectedIds(
+      selectedIds.length === tasks.length ? [] : tasks.map((t) => t.id)
+    )
+  }
+
+  function handleDeleteSelected() {
+    if (!window.confirm(`選択した ${selectedIds.length} 件のタスクを削除しますか？`)) return
+    onDeleteMany(selectedIds)
+    setSelectedIds([])
+  }
 
   function handleImport(e) {
     const file = e.target.files[0]
@@ -16,6 +42,7 @@ export default function TaskList({ tasks, allTasks, onEdit, onDelete, onImport }
         const imported = JSON.parse(ev.target.result)
         if (!Array.isArray(imported)) throw new Error('配列ではありません')
         onImport(imported)
+        setSelectedIds([])
       } catch {
         alert('JSONファイルの読み込みに失敗しました。正しい形式のファイルを選択してください。')
       } finally {
@@ -25,6 +52,9 @@ export default function TaskList({ tasks, allTasks, onEdit, onDelete, onImport }
     reader.readAsText(file)
   }
 
+  const allChecked = tasks.length > 0 && selectedIds.length === tasks.length
+  const someChecked = selectedIds.length > 0 && selectedIds.length < tasks.length
+
   return (
     <main className="max-w-4xl mx-auto px-4 py-6">
       {tasks.length === 0 ? (
@@ -32,14 +62,49 @@ export default function TaskList({ tasks, allTasks, onEdit, onDelete, onImport }
           タスクがありません
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
-          {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onEdit={onEdit} onDelete={onDelete} />
-          ))}
-        </div>
+        <>
+          {/* 一括操作バー */}
+          <div className="flex items-center justify-between mb-3 px-1">
+            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={allChecked}
+                ref={(el) => { if (el) el.indeterminate = someChecked }}
+                onChange={toggleAll}
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 cursor-pointer"
+              />
+              {selectedIds.length > 0 ? `${selectedIds.length} 件を選択中` : '全て選択'}
+            </label>
+            {selectedIds.length > 0 && (
+              <button
+                onClick={handleDeleteSelected}
+                className="flex items-center gap-1.5 text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <Trash2 size={14} />
+                {selectedIds.length} 件を削除
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                selected={selectedIds.includes(task.id)}
+                onToggle={toggleOne}
+                onEdit={onEdit}
+                onDelete={(id) => {
+                  onDelete(id)
+                  setSelectedIds((prev) => prev.filter((x) => x !== id))
+                }}
+              />
+            ))}
+          </div>
+        </>
       )}
 
-      <div className="mt-8 flex justify-center gap-3">
+      <div className="mt-8 flex justify-center gap-3 flex-wrap">
         <input
           ref={fileInputRef}
           type="file"

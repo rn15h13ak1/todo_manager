@@ -33,6 +33,11 @@ export function useTasks() {
     setTasks((prev) => prev.filter((t) => t.id !== id))
   }
 
+  function deleteTasks(ids) {
+    const idSet = new Set(ids)
+    setTasks((prev) => prev.filter((t) => !idSet.has(t.id)))
+  }
+
   function importTasks(imported) {
     setTasks(imported)
   }
@@ -79,6 +84,7 @@ export function useTasks() {
     addTask,
     updateTask,
     deleteTask,
+    deleteTasks,
     importTasks,
   }
 }
