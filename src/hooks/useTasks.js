@@ -42,7 +42,9 @@ export function useTasks() {
   const filteredTasks = useMemo(() => {
     let result = tasks
 
-    if (filters.status !== 'all') {
+    if (filters.status === 'not_done') {
+      result = result.filter((t) => t.status !== 'done')
+    } else if (filters.status !== 'all') {
       result = result.filter((t) => t.status === filters.status)
     }
     if (filters.priority !== 'all') {

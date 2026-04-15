@@ -10,6 +10,7 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey }) 
             className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
             <option value="all">すべて</option>
+            <option value="not_done">完了以外</option>
             <option value="todo">未着手</option>
             <option value="in_progress">進行中</option>
             <option value="done">完了</option>
