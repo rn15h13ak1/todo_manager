@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import FilterBar from './components/FilterBar'
 import TaskList from './components/TaskList'
@@ -27,6 +27,17 @@ export default function App() {
 
   // null = closed, { task: null } = add mode, { task: Task } = edit mode
   const [modalState, setModalState] = useState(null)
+
+  // ESC キーでフィルターリセット（モーダルが閉じているときのみ）
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape' && modalState === null && isFiltered) {
+        resetFilters()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [modalState, isFiltered, resetFilters])
 
   function handleSave(formData) {
     if (modalState.task) {
