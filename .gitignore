@@ -1,0 +1,4 @@
+node_modules/
+dist/*
+!dist/todo-manager.html
+.DS_Store
