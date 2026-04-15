@@ -15,7 +15,7 @@ const STATUS_BADGE = {
 }
 const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完了' }
 
-export default function TaskCard({ task, selected, onToggle, onEdit, onDelete }) {
+export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick }) {
   const today = new Date().toISOString().slice(0, 10)
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== 'done'
 
@@ -56,12 +56,14 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete })
         {(task.tags || []).length > 0 && (
           <div className="flex flex-wrap gap-1">
             {task.tags.map((tag) => (
-              <span
+              <button
                 key={tag}
-                className={`text-xs px-2 py-0.5 rounded-full font-medium ${tagColor(tag)}`}
+                onClick={(e) => { e.stopPropagation(); onTagClick?.(tag) }}
+                className={`text-xs px-2 py-0.5 rounded-full font-medium ${tagColor(tag)} hover:opacity-70 hover:ring-1 hover:ring-current transition-opacity cursor-pointer`}
+                title={`「${tag}」でフィルター`}
               >
                 {tag}
-              </span>
+              </button>
             ))}
           </div>
         )}

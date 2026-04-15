@@ -15,6 +15,7 @@ export default function TaskList({
   onAddTagToMany,
   onRemoveTagFromMany,
   onImport,
+  onTagClick,
 }) {
   const fileInputRef = useRef(null)
   const [selectedIds, setSelectedIds] = useState([])
@@ -142,6 +143,7 @@ export default function TaskList({
                   onDelete(id)
                   setSelectedIds((prev) => prev.filter((x) => x !== id))
                 }}
+                onTagClick={onTagClick}
               />
             ))}
           </div>
