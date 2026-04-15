@@ -74,7 +74,8 @@ export function useTasks() {
     setSortKey(INITIAL_SORT_KEY)
   }
 
-  const today = new Date().toISOString().slice(0, 10)
+  const _now = new Date()
+  const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
 
   const allTags = useMemo(() => {
     const tagSet = new Set()
