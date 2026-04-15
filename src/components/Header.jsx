@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { PlusCircle, ClipboardList } from 'lucide-react'
 import ChangelogModal from './ChangelogModal'
+import HamburgerMenu from './HamburgerMenu'
 
-export default function Header({ onAdd }) {
+export default function Header({ onAdd, allTasks, filteredTasks, onImport }) {
   const [showChangelog, setShowChangelog] = useState(false)
 
   return (
@@ -19,13 +20,20 @@ export default function Header({ onAdd }) {
           </button>
         </div>
         {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
-        <button
-          onClick={onAdd}
-          className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-        >
-          <PlusCircle size={16} />
-          タスク追加
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onAdd}
+            className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            <PlusCircle size={16} />
+            タスク追加
+          </button>
+          <HamburgerMenu
+            allTasks={allTasks}
+            filteredTasks={filteredTasks}
+            onImport={onImport}
+          />
+        </div>
       </div>
     </header>
   )

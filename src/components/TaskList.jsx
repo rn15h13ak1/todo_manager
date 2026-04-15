@@ -1,9 +1,7 @@
-import { useRef, useState } from 'react'
-import { FileDown, FileUp, Trash2, Tag, X } from 'lucide-react'
+import { useState } from 'react'
+import { Trash2, Tag, X } from 'lucide-react'
 import TaskCard from './TaskCard'
 import BulkTagModal from './BulkTagModal'
-import { exportJson } from '../utils/exportJson'
-import { exportHtml } from '../utils/exportHtml'
 
 export default function TaskList({
   tasks,
@@ -14,10 +12,8 @@ export default function TaskList({
   onDeleteMany,
   onAddTagToMany,
   onRemoveTagFromMany,
-  onImport,
   onTagClick,
 }) {
-  const fileInputRef = useRef(null)
   const [selectedIds, setSelectedIds] = useState([])
   const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
 
@@ -47,25 +43,6 @@ export default function TaskList({
   function handleBulkTagApply(tag) {
     if (bulkTagMode === 'add') onAddTagToMany(selectedIds, tag)
     else onRemoveTagFromMany(selectedIds, tag)
-  }
-
-  function handleImport(e) {
-    const file = e.target.files[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      try {
-        const imported = JSON.parse(ev.target.result)
-        if (!Array.isArray(imported)) throw new Error('配列ではありません')
-        onImport(imported)
-        setSelectedIds([])
-      } catch {
-        alert('JSONファイルの読み込みに失敗しました。正しい形式のファイルを選択してください。')
-      } finally {
-        e.target.value = ''
-      }
-    }
-    reader.readAsText(file)
   }
 
   const allChecked = tasks.length > 0 && selectedIds.length === tasks.length
@@ -149,39 +126,6 @@ export default function TaskList({
           </div>
         </>
       )}
-
-      <div className="mt-8 flex justify-center gap-3 flex-wrap">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          className="hidden"
-          onChange={handleImport}
-        />
-        <button
-          onClick={() => fileInputRef.current.click()}
-          className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
-        >
-          <FileUp size={16} />
-          JSONをインポート
-        </button>
-        <button
-          onClick={() => exportJson(allTasks)}
-          disabled={allTasks.length === 0}
-          className="flex items-center gap-2 bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
-        >
-          <FileDown size={16} />
-          JSONでエクスポート
-        </button>
-        <button
-          onClick={() => exportHtml(tasks)}
-          disabled={tasks.length === 0}
-          className="flex items-center gap-2 bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
-        >
-          <FileDown size={16} />
-          HTMLでエクスポート
-        </button>
-      </div>
 
       {bulkTagMode && (
         <BulkTagModal

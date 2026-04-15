@@ -40,7 +40,12 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="sticky top-0 z-10">
-      <Header onAdd={() => setModalState({ task: null })} />
+      <Header
+        onAdd={() => setModalState({ task: null })}
+        allTasks={tasks}
+        filteredTasks={filteredTasks}
+        onImport={importTasks}
+      />
       <FilterBar
         filters={filters}
         setFilters={setFilters}
@@ -60,7 +65,6 @@ export default function App() {
         onDeleteMany={deleteTasks}
         onAddTagToMany={addTagToTasks}
         onRemoveTagFromMany={removeTagFromTasks}
-        onImport={importTasks}
         onTagClick={(tag) => setFilters((f) => ({ ...f, tag }))}
       />
       {modalState !== null && (
