@@ -16,14 +16,18 @@ const STATUS_BADGE = {
 }
 const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完了' }
 const STATUS_ORDER = ['todo', 'in_progress', 'done']
+const PRIORITY_ORDER = ['high', 'medium', 'low']
 
-export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick, onStatusChange }) {
+export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick, onStatusChange, onPriorityChange }) {
   const _now = new Date()
   const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== 'done'
 
   const [showStatusMenu, setShowStatusMenu] = useState(false)
   const statusMenuRef = useRef(null)
+
+  const [showPriorityMenu, setShowPriorityMenu] = useState(false)
+  const priorityMenuRef = useRef(null)
 
   useEffect(() => {
     if (!showStatusMenu) return
@@ -35,6 +39,17 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [showStatusMenu])
+
+  useEffect(() => {
+    if (!showPriorityMenu) return
+    function handleClick(e) {
+      if (priorityMenuRef.current && !priorityMenuRef.current.contains(e.target)) {
+        setShowPriorityMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [showPriorityMenu])
 
   return (
     <div
@@ -57,9 +72,37 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
             {task.title}
           </h3>
           <div className="flex gap-1 shrink-0 flex-wrap justify-end">
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${PRIORITY_BADGE[task.priority]}`}>
-              {PRIORITY_LABEL[task.priority]}
-            </span>
+            <div className="relative" ref={priorityMenuRef}>
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowPriorityMenu((v) => !v) }}
+                className={`text-xs px-2 py-0.5 rounded-full font-medium cursor-pointer hover:opacity-80 hover:ring-1 hover:ring-current transition-opacity ${PRIORITY_BADGE[task.priority]}`}
+                title="クリックで優先度変更"
+              >
+                {PRIORITY_LABEL[task.priority]}
+              </button>
+              {showPriorityMenu && (
+                <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[5rem]">
+                  {PRIORITY_ORDER.map((p) => (
+                    <button
+                      key={p}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onPriorityChange?.(task.id, p)
+                        setShowPriorityMenu(false)
+                      }}
+                      className={`w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors ${
+                        p === task.priority ? 'font-bold' : ''
+                      }`}
+                    >
+                      <span className={`inline-block px-2 py-0.5 rounded-full font-medium ${PRIORITY_BADGE[p]}`}>
+                        {PRIORITY_LABEL[p]}
+                      </span>
+                      {p === task.priority && <span className="ml-1 text-gray-400">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="relative" ref={statusMenuRef}>
               <button
                 onClick={(e) => { e.stopPropagation(); setShowStatusMenu((v) => !v) }}

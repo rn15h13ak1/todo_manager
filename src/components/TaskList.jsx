@@ -14,6 +14,7 @@ export default function TaskList({
   onRemoveTagFromMany,
   onTagClick,
   onStatusChange,
+  onPriorityChange,
 }) {
   const [selectedIds, setSelectedIds] = useState([])
   const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
@@ -123,6 +124,7 @@ export default function TaskList({
                 }}
                 onTagClick={onTagClick}
                 onStatusChange={onStatusChange}
+                onPriorityChange={onPriorityChange}
               />
             ))}
           </div>
