@@ -82,6 +82,22 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
     return () => document.removeEventListener('mousedown', handleClick)
   }, [showDueDateMenu])
 
+  // いずれかのポップオーバーが開いている間、ESC で閉じる
+  useEffect(() => {
+    if (!showStatusMenu && !showPriorityMenu && !showDueDateMenu) return
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') {
+        setShowStatusMenu(false)
+        setShowPriorityMenu(false)
+        setShowDueDateMenu(false)
+        // App.jsx のフィルターリセット（ESC）が同時に発火しないようにする
+        e.stopImmediatePropagation()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [showStatusMenu, showPriorityMenu, showDueDateMenu])
+
   return (
     <div
       ref={cardRef}
