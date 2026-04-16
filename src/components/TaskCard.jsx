@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { tagColor } from '../utils/tags'
+import { formatRelativeDate } from '../utils/date'
 
 const PRIORITY_BADGE = {
   high: 'bg-red-100 text-red-700',
@@ -225,11 +226,12 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
           <div className="relative" ref={dueDateMenuRef}>
             <button
               onClick={(e) => { e.stopPropagation(); setShowDueDateMenu((v) => !v) }}
+              onDoubleClick={(e) => e.stopPropagation()}
               className={`text-xs hover:underline cursor-pointer ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}
-              title="クリックで期限を変更"
+              title={task.dueDate ? `${task.dueDate}（クリックで期限を変更）` : 'クリックで期限を設定'}
             >
               {task.dueDate
-                ? `期限: ${task.dueDate}${isOverdue ? '（期限切れ）' : ''}`
+                ? `期限: ${formatRelativeDate(task.dueDate)} (${task.dueDate})${isOverdue ? '（期限切れ）' : ''}`
                 : '期限なし'}
             </button>
             {showDueDateMenu && (
