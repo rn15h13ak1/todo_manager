@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Trash2, Tag, X } from 'lucide-react'
 import TaskCard from './TaskCard'
 import BulkTagModal from './BulkTagModal'
@@ -41,9 +41,12 @@ export default function TaskList({
     onRegisterToggleOne?.((id) => toggleOne(id))
   }, [])
 
-  // 外部から選択中タスクの一括削除を実行できるように関数を登録
+  // handleDeleteSelected は selectedIds に依存して毎レンダーで再生成されるため、
+  // ref に最新版を保持し、登録した関数は常に ref 経由で呼ぶことで古いクロージャを防ぐ
+  const handleDeleteSelectedRef = useRef(handleDeleteSelected)
+  useEffect(() => { handleDeleteSelectedRef.current = handleDeleteSelected })
   useEffect(() => {
-    onRegisterDeleteSelected?.(() => handleDeleteSelected())
+    onRegisterDeleteSelected?.(() => handleDeleteSelectedRef.current())
   }, [])
 
   // フィルター結果が変わったとき、表示外のIDを選択から除外
