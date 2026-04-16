@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Trash2, Tag, X } from 'lucide-react'
 import TaskCard from './TaskCard'
 import BulkTagModal from './BulkTagModal'
@@ -18,9 +18,21 @@ export default function TaskList({
   onDueDateChange,
   highlightedTaskId,
   focusedTaskId,
+  onSelectionChange,
+  onRegisterClearSelection,
 }) {
   const [selectedIds, setSelectedIds] = useState([])
   const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
+
+  // 選択件数を親に通知
+  useEffect(() => {
+    onSelectionChange?.(selectedIds.length)
+  }, [selectedIds])
+
+  // 外部から選択をクリアできるように関数を登録
+  useEffect(() => {
+    onRegisterClearSelection?.(() => setSelectedIds([]))
+  }, [])
 
   // フィルター結果が変わったとき、表示外のIDを選択から除外
   const visibleIds = new Set(tasks.map((t) => t.id))

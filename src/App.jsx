@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Header from './components/Header'
 import FilterBar from './components/FilterBar'
 import TaskList from './components/TaskList'
@@ -30,6 +30,8 @@ export default function App() {
 
   const [highlightedTaskId, setHighlightedTaskId] = useState(null)
   const [focusedTaskId, setFocusedTaskId] = useState(null)
+  const [selectionCount, setSelectionCount] = useState(0)
+  const clearSelectionRef = useRef(null)
 
   function handleQuickUpdate(id, updates) {
     updateTask(id, updates)
@@ -43,10 +45,14 @@ export default function App() {
       const tag = document.activeElement?.tagName
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
 
-      // ESC: フォーカス解除 → フィルターリセット の優先順位（モーダルが閉じているときのみ）
+      // ESC: フォーカス解除 → チェックボックス解除 → フィルターリセット の優先順位
       if (e.key === 'Escape' && modalState === null) {
         if (focusedTaskId) {
           setFocusedTaskId(null)
+          return
+        }
+        if (selectionCount > 0) {
+          clearSelectionRef.current?.()
           return
         }
         if (isFiltered) resetFilters()
@@ -93,7 +99,7 @@ export default function App() {
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [modalState, isFiltered, resetFilters, focusedTaskId, filteredTasks])
+  }, [modalState, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount])
 
   function handleSave(formData) {
     if (modalState.task) {
@@ -138,6 +144,8 @@ export default function App() {
         onDueDateChange={(id, dueDate) => handleQuickUpdate(id, { dueDate })}
         highlightedTaskId={highlightedTaskId}
         focusedTaskId={focusedTaskId}
+        onSelectionChange={setSelectionCount}
+        onRegisterClearSelection={(fn) => { clearSelectionRef.current = fn }}
       />
       {modalState !== null && (
         <TaskModal
