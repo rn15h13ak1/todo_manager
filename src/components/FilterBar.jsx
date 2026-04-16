@@ -1,8 +1,45 @@
+import { useState, useEffect } from 'react'
+import { loadPresets, savePresets } from '../utils/storage'
+
 // フィルターフォーカスインデックス: 0=ステータス 1=優先度 2=タグ 3=ソート 4=期限切れのみ
 const FILTER_FOCUS_RING = 'ring-2 ring-blue-500 outline-none'
 
 export default function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags, isFiltered, onReset, filterFocusIndex, searchRef }) {
   const fi = filterFocusIndex  // 短縮
+
+  const [presets, setPresets] = useState(() => loadPresets())
+  const [showPresetMenu, setShowPresetMenu] = useState(false)
+  const [savingName, setSavingName] = useState('')
+  const [showSaveForm, setShowSaveForm] = useState(false)
+
+  useEffect(() => {
+    savePresets(presets)
+  }, [presets])
+
+  function applyPreset(preset) {
+    setFilters(preset.filters)
+    setSortKey(preset.sortKey)
+    setShowPresetMenu(false)
+  }
+
+  function savePreset() {
+    const name = savingName.trim()
+    if (!name) return
+    const preset = {
+      id: crypto.randomUUID(),
+      name,
+      filters: { ...filters },
+      sortKey,
+    }
+    setPresets((prev) => [...prev, preset])
+    setSavingName('')
+    setShowSaveForm(false)
+    setShowPresetMenu(false)
+  }
+
+  function deletePreset(id) {
+    setPresets((prev) => prev.filter((p) => p.id !== id))
+  }
 
   return (
     <div className="bg-white border-b border-gray-200">
@@ -84,6 +121,69 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
           />
           期限切れのみ
         </label>
+
+        {/* プリセットメニュー */}
+        <div className="relative">
+          <button
+            onClick={() => { setShowPresetMenu((v) => !v); setShowSaveForm(false) }}
+            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 border border-gray-300 hover:border-gray-400 rounded-md px-2.5 py-1 transition-colors"
+            title="フィルタープリセット"
+          >
+            ☆ プリセット{presets.length > 0 ? ` (${presets.length})` : ''}
+          </button>
+          {showPresetMenu && (
+            <div className="absolute right-0 top-full mt-1 z-30 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[14rem] py-1">
+              {presets.length === 0 && !showSaveForm && (
+                <p className="text-xs text-gray-400 px-3 py-2">保存済みプリセットはありません</p>
+              )}
+              {presets.map((preset) => (
+                <div key={preset.id} className="flex items-center justify-between px-3 py-1.5 hover:bg-gray-50 group">
+                  <button
+                    onClick={() => applyPreset(preset)}
+                    className="text-sm text-gray-700 hover:text-blue-600 flex-1 text-left"
+                  >
+                    {preset.name}
+                  </button>
+                  <button
+                    onClick={() => deletePreset(preset.id)}
+                    className="text-xs text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2"
+                    title="削除"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <div className="border-t border-gray-100 mt-1 pt-1 px-3 pb-2">
+                {!showSaveForm ? (
+                  <button
+                    onClick={() => setShowSaveForm(true)}
+                    className="text-xs text-blue-500 hover:text-blue-700"
+                  >
+                    ＋ 現在の条件を保存
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1 mt-1">
+                    <input
+                      autoFocus
+                      type="text"
+                      value={savingName}
+                      onChange={(e) => setSavingName(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') savePreset(); if (e.key === 'Escape') setShowSaveForm(false) }}
+                      placeholder="プリセット名"
+                      className="text-xs border border-gray-300 rounded px-2 py-1 flex-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    />
+                    <button
+                      onClick={savePreset}
+                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                    >
+                      保存
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
         {isFiltered && (
           <button
