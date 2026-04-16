@@ -21,6 +21,7 @@ export default function TaskList({
   onSelectionChange,
   onRegisterClearSelection,
   onRegisterToggleOne,
+  onRegisterDeleteSelected,
 }) {
   const [selectedIds, setSelectedIds] = useState([])
   const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
@@ -38,6 +39,11 @@ export default function TaskList({
   // 外部から特定タスクの選択をトグルできるように関数を登録
   useEffect(() => {
     onRegisterToggleOne?.((id) => toggleOne(id))
+  }, [])
+
+  // 外部から選択中タスクの一括削除を実行できるように関数を登録
+  useEffect(() => {
+    onRegisterDeleteSelected?.(() => handleDeleteSelected())
   }, [])
 
   // フィルター結果が変わったとき、表示外のIDを選択から除外

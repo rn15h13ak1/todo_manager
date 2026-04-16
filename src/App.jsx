@@ -33,6 +33,7 @@ export default function App() {
   const [selectionCount, setSelectionCount] = useState(0)
   const clearSelectionRef = useRef(null)
   const toggleOneRef = useRef(null)
+  const deleteSelectedRef = useRef(null)
 
   function handleQuickUpdate(id, updates) {
     updateTask(id, updates)
@@ -88,6 +89,20 @@ export default function App() {
         return
       }
 
+      // d: 選択中タスクの一括削除 or フォーカス中タスクの削除
+      if (e.key === 'd' && !isTyping && modalState === null) {
+        if (selectionCount > 0) {
+          deleteSelectedRef.current?.()
+        } else if (focusedTaskId) {
+          const task = filteredTasks.find((t) => t.id === focusedTaskId)
+          if (task && window.confirm(`「${task.title}」を削除しますか？`)) {
+            deleteTask(focusedTaskId)
+            setFocusedTaskId(null)
+          }
+        }
+        return
+      }
+
       // Space: フォーカス中のタスクのチェックボックスをトグル
       if (e.key === ' ' && !isTyping && modalState === null && focusedTaskId) {
         e.preventDefault()
@@ -107,7 +122,7 @@ export default function App() {
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [modalState, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount])
+  }, [modalState, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount, deleteTask])
 
   function handleSave(formData) {
     if (modalState.task) {
@@ -155,6 +170,7 @@ export default function App() {
         onSelectionChange={setSelectionCount}
         onRegisterClearSelection={(fn) => { clearSelectionRef.current = fn }}
         onRegisterToggleOne={(fn) => { toggleOneRef.current = fn }}
+        onRegisterDeleteSelected={(fn) => { deleteSelectedRef.current = fn }}
       />
       {modalState !== null && (
         <TaskModal
