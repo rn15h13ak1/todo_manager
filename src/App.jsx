@@ -3,6 +3,7 @@ import Header from './components/Header'
 import FilterBar from './components/FilterBar'
 import TaskList from './components/TaskList'
 import TaskModal from './components/TaskModal'
+import ShortcutModal from './components/ShortcutModal'
 import { useTasks } from './hooks/useTasks'
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
 
   // null = closed, { task: null } = add mode, { task: Task } = edit mode
   const [modalState, setModalState] = useState(null)
+  const [showShortcutModal, setShowShortcutModal] = useState(false)
 
   const [highlightedTaskId, setHighlightedTaskId] = useState(null)
   const [focusedTaskId, setFocusedTaskId] = useState(null)
@@ -75,6 +77,12 @@ export default function App() {
       const tag = document.activeElement?.tagName
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
 
+      // ── ESC: ショートカットモーダルを閉じる ──
+      if (e.key === 'Escape' && showShortcutModal) {
+        setShowShortcutModal(false)
+        return
+      }
+
       // ── ESC: フィルターフォーカス解除 → タスクフォーカス解除 → チェックボックス解除 → フィルターリセット ──
       if (e.key === 'Escape' && modalState === null) {
         if (filterFocusIndex !== null) { setFilterFocusIndex(null); return }
@@ -105,12 +113,19 @@ export default function App() {
       }
 
       // ── 以下は入力中・モーダル表示中は無効 ──
-      if (isTyping || modalState !== null) return
+      if (isTyping || modalState !== null || showShortcutModal) return
 
       // /: 検索欄にフォーカス
       if (e.key === '/') {
         e.preventDefault()
         searchRef.current?.focus()
+        return
+      }
+
+      // ?: ショートカット一覧モーダルを開く
+      if (e.key === '?') {
+        e.preventDefault()
+        setShowShortcutModal(true)
         return
       }
 
@@ -173,7 +188,7 @@ export default function App() {
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [modalState, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount, deleteTask,
+  }, [modalState, showShortcutModal, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount, deleteTask,
       filterFocusIndex, filters, sortKey, allTags])
 
   function handleSave(formData) {
@@ -233,6 +248,9 @@ export default function App() {
           onSave={handleSave}
           onClose={() => setModalState(null)}
         />
+      )}
+      {showShortcutModal && (
+        <ShortcutModal onClose={() => setShowShortcutModal(false)} />
       )}
     </div>
   )
