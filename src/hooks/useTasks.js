@@ -103,13 +103,20 @@ export function useTasks() {
       )
     }
 
+    const byPriority = (a, b) =>
+      (PRIORITY_ORDER[a.priority] || 99) - (PRIORITY_ORDER[b.priority] || 99)
+
     return [...result].sort((a, b) => {
-      if (sortKey === 'dueDate_asc')
-        return (a.dueDate || '9999').localeCompare(b.dueDate || '9999')
-      if (sortKey === 'dueDate_desc')
-        return (b.dueDate || '').localeCompare(a.dueDate || '')
+      if (sortKey === 'dueDate_asc') {
+        const d = (a.dueDate || '9999').localeCompare(b.dueDate || '9999')
+        return d !== 0 ? d : byPriority(a, b)
+      }
+      if (sortKey === 'dueDate_desc') {
+        const d = (b.dueDate || '').localeCompare(a.dueDate || '')
+        return d !== 0 ? d : byPriority(a, b)
+      }
       if (sortKey === 'priority')
-        return (PRIORITY_ORDER[a.priority] || 99) - (PRIORITY_ORDER[b.priority] || 99)
+        return byPriority(a, b)
       if (sortKey === 'createdAt')
         return (b.createdAt || '').localeCompare(a.createdAt || '')
       return 0
