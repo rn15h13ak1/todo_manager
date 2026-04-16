@@ -53,6 +53,13 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
             onChange={(e) => setFilters((f) => ({ ...f, searchText: e.target.value }))}
             placeholder="🔍 タイトル・説明を検索"
             className="text-sm border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onKeyDown={(e) => {
+              // Esc / Enter でフォーカスを外す（検索テキストは維持、j/k 操作に戻れる）
+              if (e.key === 'Escape' || e.key === 'Enter') {
+                e.stopPropagation()
+                searchRef.current?.blur()
+              }
+            }}
           />
         </div>
         <div className="flex items-center gap-2">
