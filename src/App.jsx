@@ -250,7 +250,11 @@ export default function App() {
         onPriorityChange={(id, priority) => handleQuickUpdate(id, { priority })}
         onDueDateChange={(id, dueDate) => handleQuickUpdate(id, { dueDate })}
         onTitleChange={(id, title) => handleQuickUpdate(id, { title })}
-        onDuplicate={duplicateTask}
+        onDuplicate={(task) => {
+          const newId = duplicateTask(task)
+          setHighlightedTaskId(newId)
+          setTimeout(() => setHighlightedTaskId((cur) => (cur === newId ? null : cur)), 2000)
+        }}
         highlightedTaskId={highlightedTaskId}
         focusedTaskId={focusedTaskId}
         onSelectionChange={setSelectionCount}

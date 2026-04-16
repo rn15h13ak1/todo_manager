@@ -67,9 +67,10 @@ export function useTasks() {
   }
 
   function duplicateTask(task) {
+    const newId = crypto.randomUUID()
     const copy = {
       ...task,
-      id: crypto.randomUUID(),
+      id: newId,
       title: `${task.title} (コピー)`,
       createdAt: new Date().toISOString(),
     }
@@ -79,6 +80,7 @@ export function useTasks() {
       next.splice(idx + 1, 0, copy)
       return next
     })
+    return newId
   }
 
   function importTasks(imported) {
