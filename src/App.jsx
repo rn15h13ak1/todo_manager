@@ -245,6 +245,7 @@ export default function App() {
         onStatusChange={(id, status) => handleQuickUpdate(id, { status })}
         onPriorityChange={(id, priority) => handleQuickUpdate(id, { priority })}
         onDueDateChange={(id, dueDate) => handleQuickUpdate(id, { dueDate })}
+        onTitleChange={(id, title) => handleQuickUpdate(id, { title })}
         highlightedTaskId={highlightedTaskId}
         focusedTaskId={focusedTaskId}
         onSelectionChange={setSelectionCount}

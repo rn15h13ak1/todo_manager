@@ -19,7 +19,7 @@ const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完�
 const STATUS_ORDER = ['todo', 'in_progress', 'done']
 const PRIORITY_ORDER = ['high', 'medium', 'low']
 
-export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick, onStatusChange, onPriorityChange, onDueDateChange, highlighted, focused, compact }) {
+export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick, onStatusChange, onPriorityChange, onDueDateChange, onTitleChange, highlighted, focused, compact }) {
   const _now = new Date()
   const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== 'done'
@@ -58,6 +58,11 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
   const [showDueDateMenu, setShowDueDateMenu] = useState(false)
   const dueDateMenuRef = useRef(null)
   const dueDateInputRef = useRef(null)
+
+  // タイトルインライン編集
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [titleDraft, setTitleDraft] = useState('')
+  const titleInputRef = useRef(null)
 
   useEffect(() => {
     if (!showStatusMenu) return
@@ -134,9 +139,48 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
 
       <div className="flex flex-col gap-2 flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <h3 className={`font-semibold flex-1 leading-snug ${isOverdue ? 'text-red-600' : 'text-gray-800'}`}>
-            {task.title}
-          </h3>
+          {editingTitle ? (
+            <input
+              ref={titleInputRef}
+              type="text"
+              value={titleDraft}
+              onChange={(e) => setTitleDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.stopPropagation()
+                  const trimmed = titleDraft.trim()
+                  if (trimmed && trimmed !== task.title) onTitleChange?.(task.id, trimmed)
+                  setEditingTitle(false)
+                }
+                if (e.key === 'Escape') { e.stopPropagation(); setEditingTitle(false) }
+              }}
+              onBlur={() => {
+                const trimmed = titleDraft.trim()
+                if (trimmed && trimmed !== task.title) {
+                  onTitleChange?.(task.id, trimmed)
+                }
+                setEditingTitle(false)
+              }}
+              onClick={(e) => e.stopPropagation()}
+              onDoubleClick={(e) => e.stopPropagation()}
+              className={`font-semibold flex-1 leading-snug bg-transparent border-b-2 border-blue-400 outline-none ${isOverdue ? 'text-red-600' : 'text-gray-800'} w-full`}
+            />
+          ) : (
+            <h3
+              className={`font-semibold flex-1 leading-snug cursor-text ${isOverdue ? 'text-red-600' : 'text-gray-800'}`}
+              title="ダブルクリックでタイトルを編集"
+              onDoubleClick={(e) => {
+                e.stopPropagation()
+                blockEditRef.current = true
+                setTimeout(() => { blockEditRef.current = false }, 0)
+                setTitleDraft(task.title)
+                setEditingTitle(true)
+                setTimeout(() => titleInputRef.current?.select(), 0)
+              }}
+            >
+              {task.title}
+            </h3>
+          )}
           <div className="flex gap-1 shrink-0 flex-wrap justify-end">
             <div className="relative" ref={priorityMenuRef}>
               <button
