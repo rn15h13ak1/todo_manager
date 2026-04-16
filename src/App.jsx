@@ -29,6 +29,7 @@ export default function App() {
   const [modalState, setModalState] = useState(null)
 
   const [highlightedTaskId, setHighlightedTaskId] = useState(null)
+  const [focusedTaskId, setFocusedTaskId] = useState(null)
 
   function handleQuickUpdate(id, updates) {
     updateTask(id, updates)
@@ -42,20 +43,57 @@ export default function App() {
       const tag = document.activeElement?.tagName
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
 
-      // ESC: フィルターリセット（モーダルが閉じているときのみ）
-      if (e.key === 'Escape' && modalState === null && isFiltered) {
-        resetFilters()
+      // ESC: フォーカス解除 → フィルターリセット の優先順位（モーダルが閉じているときのみ）
+      if (e.key === 'Escape' && modalState === null) {
+        if (focusedTaskId) {
+          setFocusedTaskId(null)
+          return
+        }
+        if (isFiltered) resetFilters()
+        return
       }
 
       // n: タスク追加モーダルを開く（入力中・モーダル表示中は無効）
       if (e.key === 'n' && !isTyping && modalState === null) {
         e.preventDefault()
         setModalState({ task: null })
+        return
+      }
+
+      // j: 次のタスクにフォーカス / k: 前のタスクにフォーカス
+      if ((e.key === 'j' || e.key === 'k') && !isTyping && modalState === null) {
+        e.preventDefault()
+        if (filteredTasks.length === 0) return
+        setFocusedTaskId((prev) => {
+          const idx = filteredTasks.findIndex((t) => t.id === prev)
+          if (e.key === 'j') {
+            // 未選択 or 末尾 → 先頭、それ以外 → 次へ
+            return idx === -1 || idx === filteredTasks.length - 1
+              ? filteredTasks[0].id
+              : filteredTasks[idx + 1].id
+          } else {
+            // 未選択 or 先頭 → 末尾、それ以外 → 前へ
+            return idx <= 0
+              ? filteredTasks[filteredTasks.length - 1].id
+              : filteredTasks[idx - 1].id
+          }
+        })
+        return
+      }
+
+      // Enter: フォーカス中のタスクの編集モーダルを開く
+      if (e.key === 'Enter' && !isTyping && modalState === null && focusedTaskId) {
+        e.preventDefault()
+        const task = filteredTasks.find((t) => t.id === focusedTaskId)
+        if (task) {
+          setModalState({ task })
+          setFocusedTaskId(null)
+        }
       }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [modalState, isFiltered, resetFilters])
+  }, [modalState, isFiltered, resetFilters, focusedTaskId, filteredTasks])
 
   function handleSave(formData) {
     if (modalState.task) {
@@ -99,6 +137,7 @@ export default function App() {
         onPriorityChange={(id, priority) => handleQuickUpdate(id, { priority })}
         onDueDateChange={(id, dueDate) => handleQuickUpdate(id, { dueDate })}
         highlightedTaskId={highlightedTaskId}
+        focusedTaskId={focusedTaskId}
       />
       {modalState !== null && (
         <TaskModal
