@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Pencil, Trash2, Copy } from 'lucide-react'
+import { Trash2, Copy } from 'lucide-react'
 import { tagColor } from '../utils/tags'
 import { formatRelativeDate } from '../utils/date'
 
@@ -167,9 +167,9 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
             />
           ) : (
             <h3
-              className={`font-semibold flex-1 leading-snug cursor-text ${isOverdue ? 'text-red-600' : 'text-gray-800'}`}
-              title="ダブルクリックでタイトルを編集"
-              onDoubleClick={(e) => {
+              className={`font-semibold flex-1 leading-snug cursor-text hover:underline decoration-dotted underline-offset-2 ${isOverdue ? 'text-red-600' : 'text-gray-800'}`}
+              title="クリックでタイトルを編集"
+              onClick={(e) => {
                 e.stopPropagation()
                 blockEditRef.current = true
                 setTimeout(() => { blockEditRef.current = false }, 0)
@@ -318,13 +318,6 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
             )}
           </div>
           <div className="flex gap-3">
-            <button
-              onClick={(e) => { e.stopPropagation(); onEdit(task) }}
-              className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
-            >
-              <Pencil size={12} />
-              編集
-            </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDuplicate?.(task) }}
               className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors"

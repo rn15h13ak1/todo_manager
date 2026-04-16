@@ -14,7 +14,7 @@ export default function ShortcutModal({ onClose }) {
       shortcuts: [
         { key: 'j', desc: '次のタスクにフォーカス' },
         { key: 'k', desc: '前のタスクにフォーカス' },
-        { key: 'Enter', desc: 'フォーカス中タスクの編集モーダルを開く' },
+        { key: 'Enter', desc: 'フォーカス中タスクの編集モーダルを開く（タイトル以外をクリックでも開く）' },
         { key: 'c', desc: 'フォーカス中タスクの完了状態をトグル（完了 ↔ 未着手）' },
         { key: 'Space', desc: 'フォーカス中タスクのチェックボックスをトグル' },
         { key: 'd', desc: '選択中タスクの一括削除 または フォーカス中タスクの削除' },
