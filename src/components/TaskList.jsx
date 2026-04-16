@@ -30,6 +30,13 @@ export default function TaskList({
   const [compact, setCompact] = useState(false)
   const [archiveOpen, setArchiveOpen] = useState(false)
 
+  // フォーカスが完了タスクに移動したとき、折りたたみを自動展開する
+  useEffect(() => {
+    if (focusedTaskId && tasks.some((t) => t.id === focusedTaskId && t.status === 'done')) {
+      setArchiveOpen(true)
+    }
+  }, [focusedTaskId, tasks])
+
   // 選択件数を親に通知
   useEffect(() => {
     onSelectionChange?.(selectedIds.length)
