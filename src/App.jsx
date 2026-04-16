@@ -28,6 +28,14 @@ export default function App() {
   // null = closed, { task: null } = add mode, { task: Task } = edit mode
   const [modalState, setModalState] = useState(null)
 
+  const [highlightedTaskId, setHighlightedTaskId] = useState(null)
+
+  function handleQuickUpdate(id, updates) {
+    updateTask(id, updates)
+    setHighlightedTaskId(id)
+    setTimeout(() => setHighlightedTaskId((cur) => (cur === id ? null : cur)), 2000)
+  }
+
   // キーボードショートカット
   useEffect(() => {
     function handleKeyDown(e) {
@@ -87,8 +95,9 @@ export default function App() {
         onAddTagToMany={addTagToTasks}
         onRemoveTagFromMany={removeTagFromTasks}
         onTagClick={(tag) => setFilters((f) => ({ ...f, tag }))}
-        onStatusChange={(id, status) => updateTask(id, { status })}
-        onPriorityChange={(id, priority) => updateTask(id, { priority })}
+        onStatusChange={(id, status) => handleQuickUpdate(id, { status })}
+        onPriorityChange={(id, priority) => handleQuickUpdate(id, { priority })}
+        highlightedTaskId={highlightedTaskId}
       />
       {modalState !== null && (
         <TaskModal

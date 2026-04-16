@@ -15,6 +15,7 @@ export default function TaskList({
   onTagClick,
   onStatusChange,
   onPriorityChange,
+  highlightedTaskId,
 }) {
   const [selectedIds, setSelectedIds] = useState([])
   const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
@@ -125,6 +126,7 @@ export default function TaskList({
                 onTagClick={onTagClick}
                 onStatusChange={onStatusChange}
                 onPriorityChange={onPriorityChange}
+                highlighted={highlightedTaskId === task.id}
               />
             ))}
           </div>
