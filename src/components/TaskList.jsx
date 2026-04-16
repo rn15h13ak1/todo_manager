@@ -17,6 +17,7 @@ export default function TaskList({
   onPriorityChange,
   onDueDateChange,
   onTitleChange,
+  onDuplicate,
   highlightedTaskId,
   focusedTaskId,
   onSelectionChange,
@@ -174,6 +175,7 @@ export default function TaskList({
                 onPriorityChange={onPriorityChange}
                 onDueDateChange={onDueDateChange}
                 onTitleChange={onTitleChange}
+                onDuplicate={onDuplicate}
                 highlighted={highlightedTaskId === task.id}
                 focused={focusedTaskId === task.id}
                 compact={compact}

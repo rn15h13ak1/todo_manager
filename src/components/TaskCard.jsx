@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2, Copy } from 'lucide-react'
 import { tagColor } from '../utils/tags'
 import { formatRelativeDate } from '../utils/date'
 
@@ -19,7 +19,7 @@ const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完�
 const STATUS_ORDER = ['todo', 'in_progress', 'done']
 const PRIORITY_ORDER = ['high', 'medium', 'low']
 
-export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick, onStatusChange, onPriorityChange, onDueDateChange, onTitleChange, highlighted, focused, compact }) {
+export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onDuplicate, onTagClick, onStatusChange, onPriorityChange, onDueDateChange, onTitleChange, highlighted, focused, compact }) {
   const _now = new Date()
   const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== 'done'
@@ -317,13 +317,21 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
               </div>
             )}
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-3">
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(task) }}
               className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
             >
               <Pencil size={12} />
               編集
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); onDuplicate?.(task) }}
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+              title="タスクを複製"
+            >
+              <Copy size={12} />
+              複製
             </button>
             <button
               onClick={(e) => {

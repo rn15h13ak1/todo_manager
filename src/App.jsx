@@ -18,6 +18,7 @@ export default function App() {
     updateTask,
     deleteTask,
     deleteTasks,
+    duplicateTask,
     importTasks,
     allTags,
     addTagToTasks,
@@ -246,6 +247,7 @@ export default function App() {
         onPriorityChange={(id, priority) => handleQuickUpdate(id, { priority })}
         onDueDateChange={(id, dueDate) => handleQuickUpdate(id, { dueDate })}
         onTitleChange={(id, title) => handleQuickUpdate(id, { title })}
+        onDuplicate={duplicateTask}
         highlightedTaskId={highlightedTaskId}
         focusedTaskId={focusedTaskId}
         onSelectionChange={setSelectionCount}

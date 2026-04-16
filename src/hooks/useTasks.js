@@ -66,6 +66,21 @@ export function useTasks() {
     )
   }
 
+  function duplicateTask(task) {
+    const copy = {
+      ...task,
+      id: crypto.randomUUID(),
+      title: `${task.title} (コピー)`,
+      createdAt: new Date().toISOString(),
+    }
+    setTasks((prev) => {
+      const idx = prev.findIndex((t) => t.id === task.id)
+      const next = [...prev]
+      next.splice(idx + 1, 0, copy)
+      return next
+    })
+  }
+
   function importTasks(imported) {
     setTasks(imported)
   }
@@ -154,6 +169,7 @@ export function useTasks() {
     updateTask,
     deleteTask,
     deleteTasks,
+    duplicateTask,
     addTagToTasks,
     removeTagFromTasks,
     importTasks,
