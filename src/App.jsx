@@ -32,6 +32,7 @@ export default function App() {
   const [focusedTaskId, setFocusedTaskId] = useState(null)
   const [selectionCount, setSelectionCount] = useState(0)
   const clearSelectionRef = useRef(null)
+  const toggleOneRef = useRef(null)
 
   function handleQuickUpdate(id, updates) {
     updateTask(id, updates)
@@ -84,6 +85,13 @@ export default function App() {
               : filteredTasks[idx - 1].id
           }
         })
+        return
+      }
+
+      // Space: フォーカス中のタスクのチェックボックスをトグル
+      if (e.key === ' ' && !isTyping && modalState === null && focusedTaskId) {
+        e.preventDefault()
+        toggleOneRef.current?.(focusedTaskId)
         return
       }
 
@@ -146,6 +154,7 @@ export default function App() {
         focusedTaskId={focusedTaskId}
         onSelectionChange={setSelectionCount}
         onRegisterClearSelection={(fn) => { clearSelectionRef.current = fn }}
+        onRegisterToggleOne={(fn) => { toggleOneRef.current = fn }}
       />
       {modalState !== null && (
         <TaskModal
