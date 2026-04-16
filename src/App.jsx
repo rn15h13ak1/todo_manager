@@ -176,6 +176,17 @@ export default function App() {
         return
       }
 
+      // c: フォーカス中タスクの完了状態をトグル（done ↔ todo）
+      if (e.key === 'c' && focusedTaskId) {
+        e.preventDefault()
+        const task = filteredTasks.find((t) => t.id === focusedTaskId)
+        if (task) {
+          const newStatus = task.status === 'done' ? 'todo' : 'done'
+          handleQuickUpdate(focusedTaskId, { status: newStatus })
+        }
+        return
+      }
+
       // Enter: フォーカス中タスクの編集モーダルを開く
       if (e.key === 'Enter' && focusedTaskId) {
         e.preventDefault()
