@@ -8,6 +8,7 @@ export const INITIAL_FILTERS = {
   priority: 'all',
   tag: 'all',
   overdueOnly: false,
+  searchText: '',
 }
 export const INITIAL_SORT_KEY = 'dueDate_asc'
 
@@ -102,6 +103,14 @@ export function useTasks() {
         (t) => t.dueDate && t.dueDate < today && t.status !== 'done'
       )
     }
+    if (filters.searchText) {
+      const q = filters.searchText.toLowerCase()
+      result = result.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          (t.description || '').toLowerCase().includes(q)
+      )
+    }
 
     const byPriority = (a, b) =>
       (PRIORITY_ORDER[a.priority] || 99) - (PRIORITY_ORDER[b.priority] || 99)
@@ -128,6 +137,7 @@ export function useTasks() {
     filters.priority !== INITIAL_FILTERS.priority ||
     filters.tag !== INITIAL_FILTERS.tag ||
     filters.overdueOnly !== INITIAL_FILTERS.overdueOnly ||
+    filters.searchText !== INITIAL_FILTERS.searchText ||
     sortKey !== INITIAL_SORT_KEY
 
   return {

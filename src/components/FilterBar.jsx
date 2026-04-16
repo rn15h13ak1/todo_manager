@@ -1,12 +1,23 @@
 // フィルターフォーカスインデックス: 0=ステータス 1=優先度 2=タグ 3=ソート 4=期限切れのみ
 const FILTER_FOCUS_RING = 'ring-2 ring-blue-500 outline-none'
 
-export default function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags, isFiltered, onReset, filterFocusIndex }) {
+export default function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags, isFiltered, onReset, filterFocusIndex, searchRef }) {
   const fi = filterFocusIndex  // 短縮
 
   return (
     <div className="bg-white border-b border-gray-200">
       <div className="max-w-4xl mx-auto px-4 py-3 flex flex-wrap gap-4 items-center">
+        {/* 検索欄 */}
+        <div className="flex items-center gap-2 flex-1 min-w-[160px]">
+          <input
+            ref={searchRef}
+            type="text"
+            value={filters.searchText}
+            onChange={(e) => setFilters((f) => ({ ...f, searchText: e.target.value }))}
+            placeholder="🔍 タイトル・説明を検索"
+            className="text-sm border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
         <div className="flex items-center gap-2">
           <label className="text-sm text-gray-600 whitespace-nowrap">ステータス</label>
           <select

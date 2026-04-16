@@ -34,6 +34,7 @@ export default function App() {
   const clearSelectionRef = useRef(null)
   const toggleOneRef = useRef(null)
   const deleteSelectedRef = useRef(null)
+  const searchRef = useRef(null)
 
   // フィルターフォーカス: null=未フォーカス, 0-4=各フィルター要素
   // 0:ステータス 1:優先度 2:タグ 3:ソート 4:期限切れのみ
@@ -105,6 +106,13 @@ export default function App() {
 
       // ── 以下は入力中・モーダル表示中は無効 ──
       if (isTyping || modalState !== null) return
+
+      // /: 検索欄にフォーカス
+      if (e.key === '/') {
+        e.preventDefault()
+        searchRef.current?.focus()
+        return
+      }
 
       // n: タスク追加モーダルを開く
       if (e.key === 'n') {
@@ -195,6 +203,7 @@ export default function App() {
         isFiltered={isFiltered}
         onReset={resetFilters}
         filterFocusIndex={filterFocusIndex}
+        searchRef={searchRef}
       />
       </div>
       <TaskList
