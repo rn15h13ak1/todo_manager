@@ -87,6 +87,7 @@ export default function App() {
         onAddTagToMany={addTagToTasks}
         onRemoveTagFromMany={removeTagFromTasks}
         onTagClick={(tag) => setFilters((f) => ({ ...f, tag }))}
+        onStatusChange={(id, status) => updateTask(id, { status })}
       />
       {modalState !== null && (
         <TaskModal

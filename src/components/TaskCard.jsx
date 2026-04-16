@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { tagColor } from '../utils/tags'
 
@@ -14,11 +15,26 @@ const STATUS_BADGE = {
   done: 'bg-green-100 text-green-700',
 }
 const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完了' }
+const STATUS_ORDER = ['todo', 'in_progress', 'done']
 
-export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick }) {
+export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick, onStatusChange }) {
   const _now = new Date()
   const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== 'done'
+
+  const [showStatusMenu, setShowStatusMenu] = useState(false)
+  const statusMenuRef = useRef(null)
+
+  useEffect(() => {
+    if (!showStatusMenu) return
+    function handleClick(e) {
+      if (statusMenuRef.current && !statusMenuRef.current.contains(e.target)) {
+        setShowStatusMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [showStatusMenu])
 
   return (
     <div
@@ -44,9 +60,37 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${PRIORITY_BADGE[task.priority]}`}>
               {PRIORITY_LABEL[task.priority]}
             </span>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_BADGE[task.status]}`}>
-              {STATUS_LABEL[task.status]}
-            </span>
+            <div className="relative" ref={statusMenuRef}>
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowStatusMenu((v) => !v) }}
+                className={`text-xs px-2 py-0.5 rounded-full font-medium cursor-pointer hover:opacity-80 hover:ring-1 hover:ring-current transition-opacity ${STATUS_BADGE[task.status]}`}
+                title="クリックでステータス変更"
+              >
+                {STATUS_LABEL[task.status]}
+              </button>
+              {showStatusMenu && (
+                <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[6rem]">
+                  {STATUS_ORDER.map((s) => (
+                    <button
+                      key={s}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onStatusChange?.(task.id, s)
+                        setShowStatusMenu(false)
+                      }}
+                      className={`w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors ${
+                        s === task.status ? 'font-bold' : ''
+                      }`}
+                    >
+                      <span className={`inline-block px-2 py-0.5 rounded-full font-medium ${STATUS_BADGE[s]}`}>
+                        {STATUS_LABEL[s]}
+                      </span>
+                      {s === task.status && <span className="ml-1 text-gray-400">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
