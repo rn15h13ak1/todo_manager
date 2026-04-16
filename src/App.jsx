@@ -97,6 +97,7 @@ export default function App() {
         onTagClick={(tag) => setFilters((f) => ({ ...f, tag }))}
         onStatusChange={(id, status) => handleQuickUpdate(id, { status })}
         onPriorityChange={(id, priority) => handleQuickUpdate(id, { priority })}
+        onDueDateChange={(id, dueDate) => handleQuickUpdate(id, { dueDate })}
         highlightedTaskId={highlightedTaskId}
       />
       {modalState !== null && (

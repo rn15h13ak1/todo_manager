@@ -18,7 +18,7 @@ const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完�
 const STATUS_ORDER = ['todo', 'in_progress', 'done']
 const PRIORITY_ORDER = ['high', 'medium', 'low']
 
-export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick, onStatusChange, onPriorityChange, highlighted }) {
+export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onTagClick, onStatusChange, onPriorityChange, onDueDateChange, highlighted }) {
   const _now = new Date()
   const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== 'done'
@@ -36,6 +36,10 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
 
   const [showPriorityMenu, setShowPriorityMenu] = useState(false)
   const priorityMenuRef = useRef(null)
+
+  const [showDueDateMenu, setShowDueDateMenu] = useState(false)
+  const dueDateMenuRef = useRef(null)
+  const dueDateInputRef = useRef(null)
 
   useEffect(() => {
     if (!showStatusMenu) return
@@ -58,6 +62,17 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [showPriorityMenu])
+
+  useEffect(() => {
+    if (!showDueDateMenu) return
+    function handleClick(e) {
+      if (dueDateMenuRef.current && !dueDateMenuRef.current.contains(e.target)) {
+        setShowDueDateMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [showDueDateMenu])
 
   return (
     <div
@@ -166,11 +181,54 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
         )}
 
         <div className="flex items-center justify-between mt-1">
-          <span className={`text-xs ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
-            {task.dueDate
-              ? `期限: ${task.dueDate}${isOverdue ? '（期限切れ）' : ''}`
-              : '期限なし'}
-          </span>
+          <div className="relative" ref={dueDateMenuRef}>
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowDueDateMenu((v) => !v) }}
+              className={`text-xs hover:underline cursor-pointer ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}
+              title="クリックで期限を変更"
+            >
+              {task.dueDate
+                ? `期限: ${task.dueDate}${isOverdue ? '（期限切れ）' : ''}`
+                : '期限なし'}
+            </button>
+            {showDueDateMenu && (
+              <div className="absolute left-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg p-3 flex flex-col gap-2 min-w-[11rem]">
+                <span className="text-xs text-gray-500 font-medium">期限日</span>
+                <input
+                  type="date"
+                  ref={dueDateInputRef}
+                  defaultValue={task.dueDate || ''}
+                  className="text-xs border border-gray-300 rounded px-2 py-1 w-full"
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <div className="flex gap-1">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const val = dueDateInputRef.current?.value || null
+                      onDueDateChange?.(task.id, val)
+                      setShowDueDateMenu(false)
+                    }}
+                    className="flex-1 text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
+                  >
+                    確定
+                  </button>
+                  {task.dueDate && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onDueDateChange?.(task.id, null)
+                        setShowDueDateMenu(false)
+                      }}
+                      className="flex-1 text-xs text-red-500 border border-red-200 px-2 py-1 rounded hover:bg-red-50 transition-colors"
+                    >
+                      削除
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           <div className="flex gap-4">
             <button
               onClick={() => onEdit(task)}

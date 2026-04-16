@@ -15,6 +15,7 @@ export default function TaskList({
   onTagClick,
   onStatusChange,
   onPriorityChange,
+  onDueDateChange,
   highlightedTaskId,
 }) {
   const [selectedIds, setSelectedIds] = useState([])
@@ -126,6 +127,7 @@ export default function TaskList({
                 onTagClick={onTagClick}
                 onStatusChange={onStatusChange}
                 onPriorityChange={onPriorityChange}
+                onDueDateChange={onDueDateChange}
                 highlighted={highlightedTaskId === task.id}
               />
             ))}
