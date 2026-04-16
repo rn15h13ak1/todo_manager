@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Trash2, Tag, X } from 'lucide-react'
+import { Trash2, Tag, X, LayoutList, AlignJustify } from 'lucide-react'
 import TaskCard from './TaskCard'
 import BulkTagModal from './BulkTagModal'
 
@@ -25,6 +25,7 @@ export default function TaskList({
 }) {
   const [selectedIds, setSelectedIds] = useState([])
   const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
+  const [compact, setCompact] = useState(false)
 
   // 選択件数を親に通知
   useEffect(() => {
@@ -92,6 +93,16 @@ export default function TaskList({
           {/* 一括操作バー */}
           <div className="flex items-center justify-between mb-3 px-1 flex-wrap gap-2">
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCompact((v) => !v)}
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 border border-gray-300 hover:border-gray-400 rounded-md px-2 py-1 transition-colors"
+                title={compact ? '通常表示に切り替え' : 'コンパクト表示に切り替え'}
+              >
+                {compact ? <AlignJustify size={13} /> : <LayoutList size={13} />}
+                {compact ? '通常' : 'コンパクト'}
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
               <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -140,7 +151,7 @@ export default function TaskList({
             )}
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className={`flex flex-col ${compact ? 'gap-1' : 'gap-3'}`}>
             {tasks.map((task) => (
               <TaskCard
                 key={task.id}
@@ -158,6 +169,7 @@ export default function TaskList({
                 onDueDateChange={onDueDateChange}
                 highlighted={highlightedTaskId === task.id}
                 focused={focusedTaskId === task.id}
+                compact={compact}
               />
             ))}
           </div>
