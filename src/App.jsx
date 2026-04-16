@@ -4,6 +4,7 @@ import FilterBar from './components/FilterBar'
 import TaskList from './components/TaskList'
 import TaskModal from './components/TaskModal'
 import ShortcutModal from './components/ShortcutModal'
+import ConfirmModal from './components/ConfirmModal'
 import { useTasks } from './hooks/useTasks'
 
 export default function App() {
@@ -30,6 +31,8 @@ export default function App() {
   // null = closed, { task: null } = add mode, { task: Task } = edit mode
   const [modalState, setModalState] = useState(null)
   const [showShortcutModal, setShowShortcutModal] = useState(false)
+  // c キーの完了トグル確認: null | { id, title, newStatus }
+  const [confirmToggle, setConfirmToggle] = useState(null)
 
   const [highlightedTaskId, setHighlightedTaskId] = useState(null)
   const [focusedTaskId, setFocusedTaskId] = useState(null)
@@ -114,7 +117,7 @@ export default function App() {
       }
 
       // ── 以下は入力中・モーダル表示中は無効 ──
-      if (isTyping || modalState !== null || showShortcutModal) return
+      if (isTyping || modalState !== null || showShortcutModal || confirmToggle !== null) return
 
       // /: 検索欄にフォーカス
       if (e.key === '/') {
@@ -177,13 +180,13 @@ export default function App() {
         return
       }
 
-      // c: フォーカス中タスクの完了状態をトグル（done ↔ todo）
+      // c: フォーカス中タスクの完了状態トグル確認ダイアログを表示
       if (e.key === 'c' && focusedTaskId) {
         e.preventDefault()
         const task = filteredTasks.find((t) => t.id === focusedTaskId)
         if (task) {
           const newStatus = task.status === 'done' ? 'todo' : 'done'
-          handleQuickUpdate(focusedTaskId, { status: newStatus })
+          setConfirmToggle({ id: task.id, title: task.title, newStatus })
         }
         return
       }
@@ -200,7 +203,7 @@ export default function App() {
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [modalState, showShortcutModal, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount, deleteTask,
+  }, [modalState, showShortcutModal, confirmToggle, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount, deleteTask,
       filterFocusIndex, filters, sortKey, allTags])
 
   function handleSave(formData) {
@@ -265,6 +268,17 @@ export default function App() {
       )}
       {showShortcutModal && (
         <ShortcutModal onClose={() => setShowShortcutModal(false)} />
+      )}
+      {confirmToggle !== null && (
+        <ConfirmModal
+          message={`「${confirmToggle.title}」を${confirmToggle.newStatus === 'done' ? '完了' : '未着手'}にしますか？`}
+          confirmLabel={confirmToggle.newStatus === 'done' ? '完了にする' : '未着手に戻す'}
+          onConfirm={() => {
+            handleQuickUpdate(confirmToggle.id, { status: confirmToggle.newStatus })
+            setConfirmToggle(null)
+          }}
+          onCancel={() => setConfirmToggle(null)}
+        />
       )}
     </div>
   )
