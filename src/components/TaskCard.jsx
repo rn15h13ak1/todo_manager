@@ -27,16 +27,25 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
   // ポップオーバーを外側クリックで閉じた直後にカードクリックが発火しないようにするフラグ
   const blockEditRef = useRef(false)
 
-  useEffect(() => {
-    if (highlighted && cardRef.current) {
-      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  // sticky ヘッダー分のオフセットを考慮してカードを見える位置にスクロールする
+  function scrollCardIntoView(el) {
+    const stickyEl = document.querySelector('.sticky')
+    const headerHeight = stickyEl ? stickyEl.getBoundingClientRect().height : 0
+    const rect = el.getBoundingClientRect()
+    const MARGIN = 8
+    if (rect.top < headerHeight + MARGIN) {
+      window.scrollTo({ top: window.scrollY + rect.top - headerHeight - MARGIN, behavior: 'smooth' })
+    } else if (rect.bottom > window.innerHeight - MARGIN) {
+      window.scrollTo({ top: window.scrollY + rect.bottom - window.innerHeight + MARGIN, behavior: 'smooth' })
     }
+  }
+
+  useEffect(() => {
+    if (highlighted && cardRef.current) scrollCardIntoView(cardRef.current)
   }, [highlighted])
 
   useEffect(() => {
-    if (focused && cardRef.current) {
-      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }
+    if (focused && cardRef.current) scrollCardIntoView(cardRef.current)
   }, [focused])
 
   const [showStatusMenu, setShowStatusMenu] = useState(false)
