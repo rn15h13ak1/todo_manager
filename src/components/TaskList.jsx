@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Trash2, Tag, X, LayoutList, AlignJustify } from 'lucide-react'
+import { Trash2, Tag, X, LayoutList, AlignJustify, ChevronDown, ChevronRight } from 'lucide-react'
 import TaskCard from './TaskCard'
 import BulkTagModal from './BulkTagModal'
 
@@ -26,6 +26,7 @@ export default function TaskList({
   const [selectedIds, setSelectedIds] = useState([])
   const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
   const [compact, setCompact] = useState(false)
+  const [archiveOpen, setArchiveOpen] = useState(false)
 
   // 選択件数を親に通知
   useEffect(() => {
@@ -77,6 +78,9 @@ export default function TaskList({
     if (bulkTagMode === 'add') onAddTagToMany(selectedIds, tag)
     else onRemoveTagFromMany(selectedIds, tag)
   }
+
+  const activeTasks = tasks.filter((t) => t.status !== 'done')
+  const doneTasks = tasks.filter((t) => t.status === 'done')
 
   const allChecked = tasks.length > 0 && selectedIds.length === tasks.length
   const someChecked = selectedIds.length > 0 && selectedIds.length < tasks.length
@@ -151,8 +155,9 @@ export default function TaskList({
             )}
           </div>
 
+          {/* アクティブタスク */}
           <div className={`flex flex-col ${compact ? 'gap-1' : 'gap-3'}`}>
-            {tasks.map((task) => (
+            {activeTasks.map((task) => (
               <TaskCard
                 key={task.id}
                 task={task}
@@ -173,6 +178,43 @@ export default function TaskList({
               />
             ))}
           </div>
+
+          {/* 完了タスク（折りたたみ） */}
+          {doneTasks.length > 0 && (
+            <div className="mt-4">
+              <button
+                onClick={() => setArchiveOpen((v) => !v)}
+                className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-2"
+              >
+                {archiveOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                完了済み（{doneTasks.length}件）
+              </button>
+              {archiveOpen && (
+                <div className={`flex flex-col ${compact ? 'gap-1' : 'gap-3'} opacity-70`}>
+                  {doneTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      selected={selectedIds.includes(task.id)}
+                      onToggle={toggleOne}
+                      onEdit={onEdit}
+                      onDelete={(id) => {
+                        onDelete(id)
+                        setSelectedIds((prev) => prev.filter((x) => x !== id))
+                      }}
+                      onTagClick={onTagClick}
+                      onStatusChange={onStatusChange}
+                      onPriorityChange={onPriorityChange}
+                      onDueDateChange={onDueDateChange}
+                      highlighted={highlightedTaskId === task.id}
+                      focused={focusedTaskId === task.id}
+                      compact={compact}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </>
       )}
 
