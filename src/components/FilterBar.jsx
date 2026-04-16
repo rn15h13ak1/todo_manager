@@ -1,4 +1,9 @@
-export default function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags, isFiltered, onReset }) {
+// フィルターフォーカスインデックス: 0=ステータス 1=優先度 2=タグ 3=ソート 4=期限切れのみ
+const FILTER_FOCUS_RING = 'ring-2 ring-blue-500 outline-none'
+
+export default function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags, isFiltered, onReset, filterFocusIndex }) {
+  const fi = filterFocusIndex  // 短縮
+
   return (
     <div className="bg-white border-b border-gray-200">
       <div className="max-w-4xl mx-auto px-4 py-3 flex flex-wrap gap-4 items-center">
@@ -7,7 +12,7 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
           <select
             value={filters.status}
             onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
-            className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${fi === 0 ? FILTER_FOCUS_RING : ''}`}
           >
             <option value="all">すべて</option>
             <option value="not_done">完了以外</option>
@@ -22,7 +27,7 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
           <select
             value={filters.priority}
             onChange={(e) => setFilters((f) => ({ ...f, priority: e.target.value }))}
-            className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${fi === 1 ? FILTER_FOCUS_RING : ''}`}
           >
             <option value="all">すべて</option>
             <option value="high">高</option>
@@ -36,7 +41,7 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
           <select
             value={filters.tag}
             onChange={(e) => setFilters((f) => ({ ...f, tag: e.target.value }))}
-            className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${fi === 2 ? FILTER_FOCUS_RING : ''}`}
           >
             <option value="all">すべて</option>
             {allTags.map((tag) => (
@@ -50,7 +55,7 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
           <select
             value={sortKey}
             onChange={(e) => setSortKey(e.target.value)}
-            className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${fi === 3 ? FILTER_FOCUS_RING : ''}`}
           >
             <option value="dueDate_asc">期限日（昇順）</option>
             <option value="dueDate_desc">期限日（降順）</option>
@@ -59,7 +64,7 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
           </select>
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+        <label className={`flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none rounded px-1 ${fi === 4 ? FILTER_FOCUS_RING : ''}`}>
           <input
             type="checkbox"
             checked={filters.overdueOnly}

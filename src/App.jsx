@@ -35,6 +35,33 @@ export default function App() {
   const toggleOneRef = useRef(null)
   const deleteSelectedRef = useRef(null)
 
+  // フィルターフォーカス: null=未フォーカス, 0-4=各フィルター要素
+  // 0:ステータス 1:優先度 2:タグ 3:ソート 4:期限切れのみ
+  const [filterFocusIndex, setFilterFocusIndex] = useState(null)
+  const FILTER_COUNT = 5
+
+  // フィルターフォーカス中に j/k で選択肢を移動する
+  function moveFilterOption(delta) {
+    if (filterFocusIndex === 0) {
+      const opts = ['all', 'not_done', 'todo', 'in_progress', 'done']
+      const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(filters.status) + delta))
+      setFilters((f) => ({ ...f, status: opts[next] }))
+    } else if (filterFocusIndex === 1) {
+      const opts = ['all', 'high', 'medium', 'low']
+      const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(filters.priority) + delta))
+      setFilters((f) => ({ ...f, priority: opts[next] }))
+    } else if (filterFocusIndex === 2) {
+      const opts = ['all', ...allTags]
+      const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(filters.tag) + delta))
+      setFilters((f) => ({ ...f, tag: opts[next] }))
+    } else if (filterFocusIndex === 3) {
+      const opts = ['dueDate_asc', 'dueDate_desc', 'priority', 'createdAt']
+      const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(sortKey) + delta))
+      setSortKey(opts[next])
+    }
+    // index 4 (checkbox) は j/k で操作しない
+  }
+
   function handleQuickUpdate(id, updates) {
     updateTask(id, updates)
     setHighlightedTaskId(id)
@@ -47,50 +74,47 @@ export default function App() {
       const tag = document.activeElement?.tagName
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
 
-      // ESC: フォーカス解除 → チェックボックス解除 → フィルターリセット の優先順位
+      // ── ESC: フィルターフォーカス解除 → タスクフォーカス解除 → チェックボックス解除 → フィルターリセット ──
       if (e.key === 'Escape' && modalState === null) {
-        if (focusedTaskId) {
-          setFocusedTaskId(null)
-          return
-        }
-        if (selectionCount > 0) {
-          clearSelectionRef.current?.()
-          return
-        }
+        if (filterFocusIndex !== null) { setFilterFocusIndex(null); return }
+        if (focusedTaskId) { setFocusedTaskId(null); return }
+        if (selectionCount > 0) { clearSelectionRef.current?.(); return }
         if (isFiltered) resetFilters()
         return
       }
 
-      // n: タスク追加モーダルを開く（入力中・モーダル表示中は無効）
-      if (e.key === 'n' && !isTyping && modalState === null) {
+      // ── f: フィルターフォーカスを循環（入力中・モーダル表示中は無効）──
+      if (e.key === 'f' && !isTyping && modalState === null) {
+        e.preventDefault()
+        setFilterFocusIndex((prev) => prev === null ? 0 : (prev + 1) % FILTER_COUNT)
+        setFocusedTaskId(null) // タスクフォーカスは解除
+        return
+      }
+
+      // ── フィルターフォーカスモード: j/k/Space をフィルター操作に使用 ──
+      if (filterFocusIndex !== null) {
+        if (e.key === 'j') { e.preventDefault(); moveFilterOption(1); return }
+        if (e.key === 'k') { e.preventDefault(); moveFilterOption(-1); return }
+        if (e.key === ' ') {
+          e.preventDefault()
+          if (filterFocusIndex === 4) setFilters((f) => ({ ...f, overdueOnly: !f.overdueOnly }))
+          return
+        }
+        // 上記以外はフィルターフォーカスを抜けずそのまま無視（他キーは通常通り動作させる）
+      }
+
+      // ── 以下は入力中・モーダル表示中は無効 ──
+      if (isTyping || modalState !== null) return
+
+      // n: タスク追加モーダルを開く
+      if (e.key === 'n') {
         e.preventDefault()
         setModalState({ task: null })
         return
       }
 
-      // j: 次のタスクにフォーカス / k: 前のタスクにフォーカス
-      if ((e.key === 'j' || e.key === 'k') && !isTyping && modalState === null) {
-        e.preventDefault()
-        if (filteredTasks.length === 0) return
-        setFocusedTaskId((prev) => {
-          const idx = filteredTasks.findIndex((t) => t.id === prev)
-          if (e.key === 'j') {
-            // 未選択 or 末尾 → 先頭、それ以外 → 次へ
-            return idx === -1 || idx === filteredTasks.length - 1
-              ? filteredTasks[0].id
-              : filteredTasks[idx + 1].id
-          } else {
-            // 未選択 or 先頭 → 末尾、それ以外 → 前へ
-            return idx <= 0
-              ? filteredTasks[filteredTasks.length - 1].id
-              : filteredTasks[idx - 1].id
-          }
-        })
-        return
-      }
-
       // d: 選択中タスクの一括削除 or フォーカス中タスクの削除
-      if (e.key === 'd' && !isTyping && modalState === null) {
+      if (e.key === 'd') {
         if (selectionCount > 0) {
           deleteSelectedRef.current?.()
         } else if (focusedTaskId) {
@@ -103,15 +127,34 @@ export default function App() {
         return
       }
 
-      // Space: フォーカス中のタスクのチェックボックスをトグル
-      if (e.key === ' ' && !isTyping && modalState === null && focusedTaskId) {
+      // j/k: タスクフォーカス移動（フィルターフォーカスなし時のみ）
+      if ((e.key === 'j' || e.key === 'k') && filterFocusIndex === null) {
+        e.preventDefault()
+        if (filteredTasks.length === 0) return
+        setFocusedTaskId((prev) => {
+          const idx = filteredTasks.findIndex((t) => t.id === prev)
+          if (e.key === 'j') {
+            return idx === -1 || idx === filteredTasks.length - 1
+              ? filteredTasks[0].id
+              : filteredTasks[idx + 1].id
+          } else {
+            return idx <= 0
+              ? filteredTasks[filteredTasks.length - 1].id
+              : filteredTasks[idx - 1].id
+          }
+        })
+        return
+      }
+
+      // Space: フォーカス中タスクのチェックボックスをトグル（フィルターフォーカスなし時のみ）
+      if (e.key === ' ' && filterFocusIndex === null && focusedTaskId) {
         e.preventDefault()
         toggleOneRef.current?.(focusedTaskId)
         return
       }
 
-      // Enter: フォーカス中のタスクの編集モーダルを開く
-      if (e.key === 'Enter' && !isTyping && modalState === null && focusedTaskId) {
+      // Enter: フォーカス中タスクの編集モーダルを開く
+      if (e.key === 'Enter' && focusedTaskId) {
         e.preventDefault()
         const task = filteredTasks.find((t) => t.id === focusedTaskId)
         if (task) {
@@ -122,7 +165,8 @@ export default function App() {
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [modalState, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount, deleteTask])
+  }, [modalState, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount, deleteTask,
+      filterFocusIndex, filters, sortKey, allTags])
 
   function handleSave(formData) {
     if (modalState.task) {
@@ -150,6 +194,7 @@ export default function App() {
         allTags={allTags}
         isFiltered={isFiltered}
         onReset={resetFilters}
+        filterFocusIndex={filterFocusIndex}
       />
       </div>
       <TaskList
