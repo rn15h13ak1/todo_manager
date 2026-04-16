@@ -24,6 +24,8 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== 'done'
 
   const cardRef = useRef(null)
+  // ポップオーバーを外側クリックで閉じた直後にカードクリックが発火しないようにするフラグ
+  const blockEditRef = useRef(false)
 
   useEffect(() => {
     if (highlighted && cardRef.current) {
@@ -46,6 +48,8 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
     function handleClick(e) {
       if (statusMenuRef.current && !statusMenuRef.current.contains(e.target)) {
         setShowStatusMenu(false)
+        blockEditRef.current = true
+        setTimeout(() => { blockEditRef.current = false }, 0)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -57,6 +61,8 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
     function handleClick(e) {
       if (priorityMenuRef.current && !priorityMenuRef.current.contains(e.target)) {
         setShowPriorityMenu(false)
+        blockEditRef.current = true
+        setTimeout(() => { blockEditRef.current = false }, 0)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -68,6 +74,8 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
     function handleClick(e) {
       if (dueDateMenuRef.current && !dueDateMenuRef.current.contains(e.target)) {
         setShowDueDateMenu(false)
+        blockEditRef.current = true
+        setTimeout(() => { blockEditRef.current = false }, 0)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -77,15 +85,17 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
   return (
     <div
       ref={cardRef}
-      className={`bg-white rounded-lg shadow-sm p-4 flex gap-3 border transition-colors ${
+      onClick={() => { if (!blockEditRef.current) onEdit(task) }}
+      className={`bg-white rounded-lg shadow-sm p-4 flex gap-3 border transition-colors cursor-pointer ${
         isOverdue ? 'border-l-4 border-l-red-500 border-gray-200' : 'border-gray-200'
-      } ${selected ? 'bg-blue-50' : ''} ${highlighted ? 'task-moved' : ''}`}
+      } ${selected ? 'bg-blue-50' : 'hover:bg-gray-50'} ${highlighted ? 'task-moved' : ''}`}
     >
       <div className="flex items-start pt-0.5 shrink-0">
         <input
           type="checkbox"
           checked={selected}
           onChange={() => onToggle(task.id)}
+          onClick={(e) => e.stopPropagation()}
           className="w-4 h-4 rounded border-gray-300 text-blue-600 cursor-pointer"
         />
       </div>
@@ -231,14 +241,15 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
           </div>
           <div className="flex gap-4">
             <button
-              onClick={() => onEdit(task)}
+              onClick={(e) => { e.stopPropagation(); onEdit(task) }}
               className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
             >
               <Pencil size={12} />
               編集
             </button>
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation()
                 if (window.confirm(`「${task.title}」を削除しますか？`)) {
                   onDelete(task.id)
                 }
