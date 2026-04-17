@@ -1,3 +1,5 @@
+import { generateTimestamp } from './date'
+
 const PRIORITY_LABEL = { high: '高', medium: '中', low: '低' }
 const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完了' }
 
@@ -56,11 +58,7 @@ export function exportHtml(tasks) {
 </body>
 </html>`
 
-  const now = new Date()
-  const pad = (n) => String(n).padStart(2, '0')
-  const timestamp =
-    `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}` +
-    `_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
+  const timestamp = generateTimestamp()
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
   const url = URL.createObjectURL(blob)

@@ -1,9 +1,7 @@
+import { generateTimestamp } from './date'
+
 export function exportJson(tasks) {
-  const now = new Date()
-  const pad = (n) => String(n).padStart(2, '0')
-  const timestamp =
-    `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}` +
-    `_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
+  const timestamp = generateTimestamp()
 
   const json = JSON.stringify(tasks, null, 2)
   const blob = new Blob([json], { type: 'application/json;charset=utf-8' })

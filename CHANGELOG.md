@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.43.0] - 2026-04-17
+
+### Changed
+- `date.js` に `generateTimestamp()` を追加（YYYYMMDD_HHMMSS 形式）
+- `exportHtml.js` / `exportJson.js` の重複タイムスタンプ生成コードを `generateTimestamp()` に統一
+
 ## [1.42.0] - 2026-04-17
 
 ### Changed

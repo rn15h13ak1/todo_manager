@@ -1,4 +1,16 @@
 /**
+ * 現在日時を YYYYMMDD_HHMMSS 形式の文字列で返す（ファイル名等に使用）
+ */
+export function generateTimestamp() {
+  const now = new Date()
+  const pad = (n) => String(n).padStart(2, '0')
+  return (
+    `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}` +
+    `_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
+  )
+}
+
+/**
  * 今日の日付を YYYY-MM-DD 形式の文字列で返す
  */
 export function getTodayString() {
