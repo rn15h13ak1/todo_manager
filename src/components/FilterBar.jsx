@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { loadPresets, savePresets } from '../utils/storage'
 import { FILTER_STATUS, STATUS, SORT_KEY } from '../utils/constants'
 import { PRIORITY_ORDER, PRIORITY_LABEL } from '../utils/labels'
+import { usePopover } from '../hooks/usePopover'
 
 // フィルターフォーカスインデックス: 0=ステータス 1=優先度 2=タグ 3=ソート 4=期限切れのみ
 const FILTER_FOCUS_RING = 'ring-2 ring-blue-500 outline-none'
@@ -10,13 +11,18 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
   const fi = filterFocusIndex  // 短縮
 
   const [presets, setPresets] = useState(() => loadPresets())
-  const [showPresetMenu, setShowPresetMenu] = useState(false)
+  const { open: showPresetMenu, setOpen: setShowPresetMenu, ref: presetMenuRef } = usePopover()
   const [savingName, setSavingName] = useState('')
   const [showSaveForm, setShowSaveForm] = useState(false)
 
   useEffect(() => {
     savePresets(presets)
   }, [presets])
+
+  // メニューが閉じたとき保存フォームもリセット
+  useEffect(() => {
+    if (!showPresetMenu) { setShowSaveForm(false); setSavingName('') }
+  }, [showPresetMenu])
 
   function applyPreset(preset) {
     setFilters(preset.filters)
@@ -132,9 +138,9 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
         </label>
 
         {/* プリセットメニュー */}
-        <div className="relative">
+        <div className="relative" ref={presetMenuRef}>
           <button
-            onClick={() => { setShowPresetMenu((v) => !v); setShowSaveForm(false) }}
+            onClick={() => setShowPresetMenu((v) => !v)}
             className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 border border-gray-300 hover:border-gray-400 rounded-md px-2.5 py-1 transition-colors"
             title="フィルタープリセット"
           >
