@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.48.0] - 2026-04-17
+
+### Changed
+- `STATUS` / `PRIORITY` 定数を `constants.js` に追加
+- `'done'` `'todo'` `'in_progress'` `'high'` `'medium'` `'low'` の文字列リテラルを全7ファイルで定数参照に統一
+  - App.jsx / TaskCard.jsx / TaskList.jsx / Header.jsx / TaskModal.jsx / useTasks.js / useKeyboard.js
+
 ## [1.47.0] - 2026-04-17
 
 ### Changed

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { loadTasks, saveTasks } from '../utils/storage'
 import { getTodayString } from '../utils/date'
+import { STATUS } from '../utils/constants'
 
 // ソート用の重み（小さいほど優先度が高い）
 const PRIORITY_SORT_WEIGHT = { high: 1, medium: 2, low: 3 }
@@ -106,7 +107,7 @@ export function useTasks() {
     let result = tasks
 
     if (filters.status === 'not_done') {
-      result = result.filter((t) => t.status !== 'done')
+      result = result.filter((t) => t.status !== STATUS.DONE)
     } else if (filters.status !== 'all') {
       result = result.filter((t) => t.status === filters.status)
     }
@@ -118,7 +119,7 @@ export function useTasks() {
     }
     if (filters.overdueOnly) {
       result = result.filter(
-        (t) => t.dueDate && t.dueDate < today && t.status !== 'done'
+        (t) => t.dueDate && t.dueDate < today && t.status !== STATUS.DONE
       )
     }
     if (filters.searchText) {

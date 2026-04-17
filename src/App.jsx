@@ -8,7 +8,7 @@ import ConfirmModal from './components/ConfirmModal'
 import { useTasks } from './hooks/useTasks'
 import { useKeyboard } from './hooks/useKeyboard'
 import { useSelection } from './hooks/useSelection'
-import { HIGHLIGHT_DURATION_MS } from './utils/constants'
+import { HIGHLIGHT_DURATION_MS, STATUS } from './utils/constants'
 
 export default function App() {
   const {
@@ -144,8 +144,8 @@ export default function App() {
       )}
       {confirmToggle !== null && (
         <ConfirmModal
-          message={`「${confirmToggle.title}」を${confirmToggle.newStatus === 'done' ? '完了' : '未着手'}にしますか？`}
-          confirmLabel={confirmToggle.newStatus === 'done' ? '完了にする' : '未着手に戻す'}
+          message={`「${confirmToggle.title}」を${confirmToggle.newStatus === STATUS.DONE ? '完了' : '未着手'}にしますか？`}
+          confirmLabel={confirmToggle.newStatus === STATUS.DONE ? '完了にする' : '未着手に戻す'}
           onConfirm={() => {
             handleQuickUpdate(confirmToggle.id, { status: confirmToggle.newStatus })
             setConfirmToggle(null)

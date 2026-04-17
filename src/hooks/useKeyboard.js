@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { HIGHLIGHT_DURATION_MS } from '../utils/constants'
+import { HIGHLIGHT_DURATION_MS, STATUS, PRIORITY } from '../utils/constants'
 
 const FILTER_COUNT = 5
 
@@ -49,11 +49,11 @@ export function useKeyboard({
     // フィルターフォーカス中に j/k で選択肢を移動する
     function moveFilterOption(delta) {
       if (filterFocusIndex === 0) {
-        const opts = ['all', 'not_done', 'todo', 'in_progress', 'done']
+        const opts = ['all', 'not_done', STATUS.TODO, STATUS.IN_PROGRESS, STATUS.DONE]
         const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(filters.status) + delta))
         setFilters((f) => ({ ...f, status: opts[next] }))
       } else if (filterFocusIndex === 1) {
-        const opts = ['all', 'high', 'medium', 'low']
+        const opts = ['all', PRIORITY.HIGH, PRIORITY.MEDIUM, PRIORITY.LOW]
         const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(filters.priority) + delta))
         setFilters((f) => ({ ...f, priority: opts[next] }))
       } else if (filterFocusIndex === 2) {
@@ -182,7 +182,7 @@ export function useKeyboard({
         e.preventDefault()
         const task = filteredTasks.find((t) => t.id === focusedTaskId)
         if (task) {
-          const newStatus = task.status === 'done' ? 'todo' : 'done'
+          const newStatus = task.status === STATUS.DONE ? STATUS.TODO : STATUS.DONE
           setConfirmToggle({ id: task.id, title: task.title, newStatus })
         }
         return
@@ -235,7 +235,7 @@ export function useKeyboard({
       // 1/2/3: フォーカス中タスクの優先度を 高/中/低 に変更
       if ((e.key === '1' || e.key === '2' || e.key === '3') && focusedTaskId) {
         e.preventDefault()
-        const priority = e.key === '1' ? 'high' : e.key === '2' ? 'medium' : 'low'
+        const priority = e.key === '1' ? PRIORITY.HIGH : e.key === '2' ? PRIORITY.MEDIUM : PRIORITY.LOW
         handleQuickUpdate(focusedTaskId, { priority })
         return
       }

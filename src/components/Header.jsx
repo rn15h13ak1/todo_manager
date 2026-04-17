@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { PlusCircle, ClipboardList } from 'lucide-react'
 import ChangelogModal from './ChangelogModal'
 import HamburgerMenu from './HamburgerMenu'
+import { STATUS } from '../utils/constants'
 
 export default function Header({ onAdd, allTasks, filteredTasks, onImport }) {
   const [showChangelog, setShowChangelog] = useState(false)
 
-  const todoCount = allTasks.filter((t) => t.status === 'todo').length
-  const inProgressCount = allTasks.filter((t) => t.status === 'in_progress').length
-  const doneCount = allTasks.filter((t) => t.status === 'done').length
+  const todoCount = allTasks.filter((t) => t.status === STATUS.TODO).length
+  const inProgressCount = allTasks.filter((t) => t.status === STATUS.IN_PROGRESS).length
+  const doneCount = allTasks.filter((t) => t.status === STATUS.DONE).length
 
   return (
     <header className="bg-white shadow-sm">

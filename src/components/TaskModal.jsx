@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { X, Plus } from 'lucide-react'
 import { tagColor } from '../utils/tags'
+import { STATUS, PRIORITY } from '../utils/constants'
 
 const EMPTY_FORM = {
   title: '',
   description: '',
   dueDate: '',
-  priority: 'medium',
-  status: 'todo',
+  priority: PRIORITY.MEDIUM,
+  status: STATUS.TODO,
   tags: [],
 }
 
@@ -29,8 +30,8 @@ export default function TaskModal({ task, allTags, onSave, onClose }) {
         title: task.title || '',
         description: task.description || '',
         dueDate: task.dueDate || '',
-        priority: task.priority || 'medium',
-        status: task.status || 'todo',
+        priority: task.priority || PRIORITY.MEDIUM,
+        status: task.status || STATUS.TODO,
         tags: task.tags || [],
       })
     } else {

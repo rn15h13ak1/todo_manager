@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { STATUS } from '../utils/constants'
 import { Trash2, Tag, X, LayoutList, AlignJustify, ChevronDown, ChevronRight } from 'lucide-react'
 import TaskCard from './TaskCard'
 import BulkTagModal from './BulkTagModal'
@@ -28,7 +29,7 @@ export default function TaskList({
 
   // フォーカスが完了タスクに移動したとき、折りたたみを自動展開する
   useEffect(() => {
-    if (focusedTaskId && tasks.some((t) => t.id === focusedTaskId && t.status === 'done')) {
+    if (focusedTaskId && tasks.some((t) => t.id === focusedTaskId && t.status === STATUS.DONE)) {
       setArchiveOpen(true)
     }
   }, [focusedTaskId, tasks])
@@ -39,7 +40,7 @@ export default function TaskList({
   }
 
   const activeTasks = tasks.filter((t) => t.status !== 'done')
-  const doneTasks = tasks.filter((t) => t.status === 'done')
+  const doneTasks = tasks.filter((t) => t.status === STATUS.DONE)
 
   const allChecked = tasks.length > 0 && selectedIds.length === tasks.length
   const someChecked = selectedIds.length > 0 && selectedIds.length < tasks.length
