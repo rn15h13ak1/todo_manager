@@ -23,52 +23,11 @@ export default function BulkTagModal({ mode, selectedTasks, allTags, onApply, on
     onClose()
   }
 
-  // 確認ステップ
-  if (pendingTag !== null) {
-    return (
-      <div
-        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-        onClick={(e) => e.target === e.currentTarget && onClose()}
-      >
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            <h2 className="text-base font-semibold text-gray-800">確認</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-              <X size={20} />
-            </button>
-          </div>
-          <div className="px-6 py-5 flex flex-col gap-4">
-            <p className="text-sm text-gray-700">
-              <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${tagColor(pendingTag)} mr-1.5`}>
-                {pendingTag}
-              </span>
-              を {selectedTasks.length} 件のタスクに
-              {mode === 'add' ? '追加' : '削除'}しますか？
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setPendingTag(null)}
-                className="flex items-center gap-1.5 flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm transition-colors"
-              >
-                <ArrowLeft size={14} />
-                戻る
-              </button>
-              <button
-                onClick={handleConfirm}
-                className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${
-                  mode === 'add'
-                    ? 'bg-purple-500 hover:bg-purple-600'
-                    : 'bg-red-500 hover:bg-red-600'
-                }`}
-              >
-                {mode === 'add' ? '追加する' : '削除する'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const title = pendingTag !== null
+    ? '確認'
+    : mode === 'add'
+      ? `タグを一括追加（${selectedTasks.length}件）`
+      : `タグを一括削除（${selectedTasks.length}件）`
 
   return (
     <div
@@ -76,17 +35,46 @@ export default function BulkTagModal({ mode, selectedTasks, allTags, onApply, on
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm">
+        {/* ヘッダー */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-base font-semibold text-gray-800">
-            {mode === 'add' ? `タグを一括追加（${selectedTasks.length}件）` : `タグを一括削除（${selectedTasks.length}件）`}
-          </h2>
+          <h2 className="text-base font-semibold text-gray-800">{title}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={20} />
           </button>
         </div>
 
+        {/* ボディ */}
         <div className="px-6 py-5 flex flex-col gap-4">
-          {mode === 'add' ? (
+          {pendingTag !== null ? (
+            // 確認ステップ
+            <>
+              <p className="text-sm text-gray-700">
+                <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${tagColor(pendingTag)} mr-1.5`}>
+                  {pendingTag}
+                </span>
+                を {selectedTasks.length} 件のタスクに
+                {mode === 'add' ? '追加' : '削除'}しますか？
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setPendingTag(null)}
+                  className="flex items-center gap-1.5 flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm transition-colors"
+                >
+                  <ArrowLeft size={14} />
+                  戻る
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${
+                    mode === 'add' ? 'bg-purple-500 hover:bg-purple-600' : 'bg-red-500 hover:bg-red-600'
+                  }`}
+                >
+                  {mode === 'add' ? '追加する' : '削除する'}
+                </button>
+              </div>
+            </>
+          ) : mode === 'add' ? (
+            // 追加ステップ
             <>
               <div className="flex gap-2">
                 <input
@@ -130,6 +118,7 @@ export default function BulkTagModal({ mode, selectedTasks, allTags, onApply, on
               </button>
             </>
           ) : (
+            // 削除ステップ
             <>
               {removableTags.length === 0 ? (
                 <p className="text-sm text-gray-500 text-center py-4">
