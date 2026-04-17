@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.57.0] - 2026-04-17
+
+### Fixed
+- `useHighlight.js` の `setTimeout` にタイマー ID を保持し、アンマウント時・再呼び出し時に `clearTimeout` するよう修正
+
 ## [1.56.0] - 2026-04-17
 
 ### Changed
