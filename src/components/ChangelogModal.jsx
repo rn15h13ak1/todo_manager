@@ -43,7 +43,7 @@ export default function ChangelogModal({ onClose }) {
           </button>
         </div>
         <div className="px-6 py-4 overflow-y-auto">
-          <ul className="space-y-0.5">{renderMarkdown(changelog)}</ul>
+          <ul className="space-y-0.5">{renderMarkdown(changelog).filter(Boolean)}</ul>
         </div>
       </div>
     </ModalBackdrop>

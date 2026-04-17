@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.63.0] - 2026-04-17
+
+### Changed
+- `ChangelogModal.jsx` の `renderMarkdown()` 結果に `.filter(Boolean)` を追加し、null エントリを除去
+
 ## [1.62.0] - 2026-04-17
 
 ### Fixed
