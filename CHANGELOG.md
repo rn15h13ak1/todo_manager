@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.58.0] - 2026-04-17
+
+### Fixed
+- `TaskList.jsx` の完了タスク（doneTasks）に `onDuplicate` が渡っていなかったバグを修正
+- 同箇所の `onDelete` インライン関数を `handleDelete` に統一
+
 ## [1.57.0] - 2026-04-17
 
 ### Fixed

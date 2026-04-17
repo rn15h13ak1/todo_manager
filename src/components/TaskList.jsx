@@ -159,12 +159,10 @@ export default function TaskList({
                       selected={selectedIds.includes(task.id)}
                       onToggle={toggleOne}
                       onEdit={onEdit}
-                      onDelete={(id) => {
-                        onDelete(id)
-                        removeFromSelection(id)
-                      }}
+                      onDelete={handleDelete}
                       onTagClick={onTagClick}
                       onUpdate={onUpdate}
+                      onDuplicate={onDuplicate}
                       highlighted={highlightedTaskId === task.id}
                       focused={focusedTaskId === task.id}
                       compact={compact}
