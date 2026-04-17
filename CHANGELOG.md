@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.59.0] - 2026-04-17
+
+### Fixed
+- `exportHtml.js` / `exportJson.js` のダウンロード処理を try/finally で囲み、例外時も `URL.revokeObjectURL` が確実に呼ばれるよう修正
+
 ## [1.58.0] - 2026-04-17
 
 ### Fixed

@@ -64,7 +64,10 @@ export function exportHtml(tasks) {
   a.href = url
   a.download = `todo-manager_${timestamp}.html`
   document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  try {
+    a.click()
+  } finally {
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
 }
