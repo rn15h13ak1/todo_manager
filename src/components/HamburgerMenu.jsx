@@ -3,6 +3,21 @@ import { Menu, X, FileUp, FileDown } from 'lucide-react'
 import { exportJson } from '../utils/exportJson'
 import { exportHtml } from '../utils/exportHtml'
 import { usePopover } from '../hooks/usePopover'
+import { STATUS, PRIORITY } from '../utils/constants'
+
+const VALID_STATUSES  = new Set(Object.values(STATUS))
+const VALID_PRIORITIES = new Set(Object.values(PRIORITY))
+
+function isValidTask(t) {
+  return (
+    t !== null &&
+    typeof t === 'object' &&
+    typeof t.id === 'string' && t.id.trim() !== '' &&
+    typeof t.title === 'string' && t.title.trim() !== '' &&
+    VALID_STATUSES.has(t.status) &&
+    VALID_PRIORITIES.has(t.priority)
+  )
+}
 
 export default function HamburgerMenu({ allTasks, filteredTasks, onImport }) {
   const { open, setOpen, ref } = usePopover()
@@ -15,7 +30,7 @@ export default function HamburgerMenu({ allTasks, filteredTasks, onImport }) {
     reader.onload = (ev) => {
       try {
         const imported = JSON.parse(ev.target.result)
-        if (!Array.isArray(imported)) throw new Error()
+        if (!Array.isArray(imported) || !imported.every(isValidTask)) throw new Error()
         onImport(imported)
         setOpen(false)
       } catch {

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.62.0] - 2026-04-17
+
+### Fixed
+- `HamburgerMenu.jsx` の JSON インポート時に各タスクのスキーマ検証（`id` / `title` / `status` / `priority` の必須チェック）を追加
+
 ## [1.61.0] - 2026-04-17
 
 ### Fixed
