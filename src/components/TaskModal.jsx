@@ -124,12 +124,12 @@ export default function TaskModal({ task, allTags, onSave, onClose }) {
     if (mode === 'nav') {
       if (e.key === 'j') {
         e.preventDefault()
-        setNavIndex((i) => Math.min(TOTAL_NAV - 1, i + 1))
+        setNavIndex((i) => (i + 1) % TOTAL_NAV)
         return
       }
       if (e.key === 'k') {
         e.preventDefault()
-        setNavIndex((i) => Math.max(0, i - 1))
+        setNavIndex((i) => (i - 1 + TOTAL_NAV) % TOTAL_NAV)
         return
       }
       if (e.key === 'Enter') {
