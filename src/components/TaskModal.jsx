@@ -14,6 +14,7 @@ const EMPTY_FORM = {
   tags: [],
 }
 
+// ナビゲーション項目数: 0=タイトル 1=説明 2=期限日 3=優先度 4=ステータス 5=タグ 6=キャンセル 7=追加/更新
 const TOTAL_NAV = 8
 
 export default function TaskModal({ task, allTags, onSave, onClose }) {

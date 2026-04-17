@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.55.0] - 2026-04-17
+
+### Changed
+- `TaskModal.jsx` の `TOTAL_NAV` にナビゲーション項目の内訳コメントを追加
+
 ## [1.54.0] - 2026-04-17
 
 ### Changed
