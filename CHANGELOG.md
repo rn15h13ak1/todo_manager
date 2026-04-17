@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.45.0] - 2026-04-17
+
+### Changed
+- `TaskCard` の `scrollCardIntoView` を呼ぶ useEffect 2つを1つに統合
+  - `highlighted` / `focused` / `compact` の3つを依存配列に持つ単一の useEffect に整理
+
 ## [1.44.0] - 2026-04-17
 
 ### Changed

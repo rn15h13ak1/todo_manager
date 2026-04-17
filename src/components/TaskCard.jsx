@@ -27,12 +27,8 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
   }
 
   useEffect(() => {
-    if (highlighted && cardRef.current) scrollCardIntoView(cardRef.current)
-  }, [highlighted])
-
-  useEffect(() => {
-    if (focused && cardRef.current) scrollCardIntoView(cardRef.current)
-  }, [focused, compact])
+    if ((highlighted || focused) && cardRef.current) scrollCardIntoView(cardRef.current)
+  }, [highlighted, focused, compact])
 
   const statusMenu   = usePopover(blockEditRef)
   const priorityMenu = usePopover(blockEditRef)
