@@ -5,7 +5,8 @@ export function loadTasks() {
   try {
     const data = localStorage.getItem(STORAGE_KEY)
     return data ? JSON.parse(data) : []
-  } catch {
+  } catch (e) {
+    console.error('[storage] タスクの読み込みに失敗しました:', e)
     return []
   }
 }
@@ -18,7 +19,8 @@ export function loadPresets() {
   try {
     const data = localStorage.getItem(PRESETS_KEY)
     return data ? JSON.parse(data) : []
-  } catch {
+  } catch (e) {
+    console.error('[storage] プリセットの読み込みに失敗しました:', e)
     return []
   }
 }

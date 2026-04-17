@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.47.0] - 2026-04-17
+
+### Changed
+- `storage.js` の catch ブロックにサイレント握りつぶしを防ぐ `console.error` を追加
+
 ## [1.46.0] - 2026-04-17
 
 ### Changed
