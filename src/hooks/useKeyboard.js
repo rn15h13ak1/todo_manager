@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { HIGHLIGHT_DURATION_MS, STATUS, PRIORITY } from '../utils/constants'
+import { HIGHLIGHT_DURATION_MS, STATUS, PRIORITY, FILTER_STATUS } from '../utils/constants'
 
 const FILTER_COUNT = 5
 
@@ -49,15 +49,15 @@ export function useKeyboard({
     // フィルターフォーカス中に j/k で選択肢を移動する
     function moveFilterOption(delta) {
       if (filterFocusIndex === 0) {
-        const opts = ['all', 'not_done', STATUS.TODO, STATUS.IN_PROGRESS, STATUS.DONE]
+        const opts = [FILTER_STATUS.ALL, FILTER_STATUS.NOT_DONE, STATUS.TODO, STATUS.IN_PROGRESS, STATUS.DONE]
         const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(filters.status) + delta))
         setFilters((f) => ({ ...f, status: opts[next] }))
       } else if (filterFocusIndex === 1) {
-        const opts = ['all', PRIORITY.HIGH, PRIORITY.MEDIUM, PRIORITY.LOW]
+        const opts = [FILTER_STATUS.ALL, PRIORITY.HIGH, PRIORITY.MEDIUM, PRIORITY.LOW]
         const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(filters.priority) + delta))
         setFilters((f) => ({ ...f, priority: opts[next] }))
       } else if (filterFocusIndex === 2) {
-        const opts = ['all', ...allTags]
+        const opts = [FILTER_STATUS.ALL, ...allTags]
         const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(filters.tag) + delta))
         setFilters((f) => ({ ...f, tag: opts[next] }))
       } else if (filterFocusIndex === 3) {

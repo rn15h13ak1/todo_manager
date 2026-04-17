@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.52.0] - 2026-04-17
+
+### Changed
+- `constants.js` に `FILTER_STATUS`（`ALL` / `NOT_DONE`）を追加
+- `useTasks.js` / `useKeyboard.js` / `FilterBar.jsx` の `'all'` `'not_done'` 文字列リテラルを `FILTER_STATUS` 定数に統一
+
 ## [1.51.0] - 2026-04-17
 
 ### Changed

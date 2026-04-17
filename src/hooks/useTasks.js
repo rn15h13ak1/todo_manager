@@ -1,15 +1,15 @@
 import { useState, useEffect, useMemo } from 'react'
 import { loadTasks, saveTasks } from '../utils/storage'
 import { getTodayString } from '../utils/date'
-import { STATUS } from '../utils/constants'
+import { STATUS, FILTER_STATUS } from '../utils/constants'
 
 // ソート用の重み（小さいほど優先度が高い）
 const PRIORITY_SORT_WEIGHT = { high: 1, medium: 2, low: 3 }
 
 export const INITIAL_FILTERS = {
-  status: 'not_done',
-  priority: 'all',
-  tag: 'all',
+  status: FILTER_STATUS.NOT_DONE,
+  priority: FILTER_STATUS.ALL,
+  tag: FILTER_STATUS.ALL,
   overdueOnly: false,
   searchText: '',
 }
@@ -106,15 +106,15 @@ export function useTasks() {
   const filteredTasks = useMemo(() => {
     let result = tasks
 
-    if (filters.status === 'not_done') {
+    if (filters.status === FILTER_STATUS.NOT_DONE) {
       result = result.filter((t) => t.status !== STATUS.DONE)
-    } else if (filters.status !== 'all') {
+    } else if (filters.status !== FILTER_STATUS.ALL) {
       result = result.filter((t) => t.status === filters.status)
     }
-    if (filters.priority !== 'all') {
+    if (filters.priority !== FILTER_STATUS.ALL) {
       result = result.filter((t) => t.priority === filters.priority)
     }
-    if (filters.tag !== 'all') {
+    if (filters.tag !== FILTER_STATUS.ALL) {
       result = result.filter((t) => (t.tags || []).includes(filters.tag))
     }
     if (filters.overdueOnly) {

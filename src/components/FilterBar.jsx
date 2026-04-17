@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { loadPresets, savePresets } from '../utils/storage'
+import { FILTER_STATUS } from '../utils/constants'
 
 // フィルターフォーカスインデックス: 0=ステータス 1=優先度 2=タグ 3=ソート 4=期限切れのみ
 const FILTER_FOCUS_RING = 'ring-2 ring-blue-500 outline-none'
@@ -69,8 +70,8 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
             onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
             className={`text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${fi === 0 ? FILTER_FOCUS_RING : ''}`}
           >
-            <option value="all">すべて</option>
-            <option value="not_done">完了以外</option>
+            <option value={FILTER_STATUS.ALL}>すべて</option>
+            <option value={FILTER_STATUS.NOT_DONE}>完了以外</option>
             <option value="todo">未着手</option>
             <option value="in_progress">進行中</option>
             <option value="done">完了</option>
@@ -84,7 +85,7 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
             onChange={(e) => setFilters((f) => ({ ...f, priority: e.target.value }))}
             className={`text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${fi === 1 ? FILTER_FOCUS_RING : ''}`}
           >
-            <option value="all">すべて</option>
+            <option value={FILTER_STATUS.ALL}>すべて</option>
             <option value="high">高</option>
             <option value="medium">中</option>
             <option value="low">低</option>
@@ -98,7 +99,7 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
             onChange={(e) => setFilters((f) => ({ ...f, tag: e.target.value }))}
             className={`text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${fi === 2 ? FILTER_FOCUS_RING : ''}`}
           >
-            <option value="all">すべて</option>
+            <option value={FILTER_STATUS.ALL}>すべて</option>
             {allTags.map((tag) => (
               <option key={tag} value={tag}>{tag}</option>
             ))}

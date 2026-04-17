@@ -8,6 +8,12 @@ export const STATUS = {
   DONE: 'done',
 }
 
+/** ステータスフィルター専用の追加値（タスクの status フィールドには存在しない） */
+export const FILTER_STATUS = {
+  ALL: 'all',
+  NOT_DONE: 'not_done',
+}
+
 /** 優先度値の定数 */
 export const PRIORITY = {
   HIGH: 'high',
