@@ -12,7 +12,11 @@ export function loadTasks() {
 }
 
 export function saveTasks(tasks) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+  } catch (e) {
+    console.error('[storage] タスクの保存に失敗しました:', e)
+  }
 }
 
 export function loadPresets() {
@@ -26,5 +30,9 @@ export function loadPresets() {
 }
 
 export function savePresets(presets) {
-  localStorage.setItem(PRESETS_KEY, JSON.stringify(presets))
+  try {
+    localStorage.setItem(PRESETS_KEY, JSON.stringify(presets))
+  } catch (e) {
+    console.error('[storage] プリセットの保存に失敗しました:', e)
+  }
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.51.0] - 2026-04-17
+
+### Changed
+- `storage.js` の `saveTasks` / `savePresets` に try/catch を追加（localStorage 書き込み失敗時に `console.error` で通知）
+
 ## [1.50.0] - 2026-04-17
 
 ### Changed
