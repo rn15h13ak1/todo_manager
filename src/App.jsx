@@ -99,7 +99,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="sticky top-0 z-10">
+      <div id="app-header" className="sticky top-0 z-10">
       <Header
         onAdd={() => setModalState({ task: null })}
         allTasks={tasks}

@@ -17,7 +17,7 @@ const TaskCard = memo(function TaskCard({ task, selected, onToggle, onEdit, onDe
 
   // sticky ヘッダー分のオフセットを考慮してカードを見える位置にスクロールする
   function scrollCardIntoView(el) {
-    const stickyEl = document.querySelector('.sticky')
+    const stickyEl = document.getElementById('app-header')
     const headerHeight = stickyEl ? stickyEl.getBoundingClientRect().height : 0
     const rect = el.getBoundingClientRect()
     const MARGIN = 8

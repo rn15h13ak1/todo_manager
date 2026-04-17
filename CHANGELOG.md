@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.56.0] - 2026-04-17
+
+### Changed
+- `TaskCard.jsx` のスクロール計算を `querySelector('.sticky')` から `getElementById('app-header')` に変更し、クラス名依存を解消
+
 ## [1.55.0] - 2026-04-17
 
 ### Changed
