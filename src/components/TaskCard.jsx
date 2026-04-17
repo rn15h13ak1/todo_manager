@@ -47,7 +47,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
 
   useEffect(() => {
     if (focused && cardRef.current) scrollCardIntoView(cardRef.current)
-  }, [focused])
+  }, [focused, compact])
 
   const [showStatusMenu, setShowStatusMenu] = useState(false)
   const statusMenuRef = useRef(null)
