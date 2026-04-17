@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.48.1] - 2026-04-17
+
+### Fixed
+- `TaskList.jsx` の `activeTasks` フィルターで `'done'` 文字列リテラルが残っていた箇所を `STATUS.DONE` に修正
+
 ## [1.48.0] - 2026-04-17
 
 ### Changed

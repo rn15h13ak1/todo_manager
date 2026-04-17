@@ -39,7 +39,7 @@ export default function TaskList({
     else onRemoveTagFromMany(selectedIds, tag)
   }
 
-  const activeTasks = tasks.filter((t) => t.status !== 'done')
+  const activeTasks = tasks.filter((t) => t.status !== STATUS.DONE)
   const doneTasks = tasks.filter((t) => t.status === STATUS.DONE)
 
   const allChecked = tasks.length > 0 && selectedIds.length === tasks.length
