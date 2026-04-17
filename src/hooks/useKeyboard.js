@@ -28,7 +28,13 @@ export function useKeyboard({
   filteredTasks,
   focusedTaskId,
   setFocusedTaskId,
-  selectionCount,
+  // 選択系
+  selectedIds,
+  clearSelection,
+  toggleOne,
+  toggleAll,
+  deleteSelected,
+  // タスク操作
   deleteTask,
   duplicateTask,
   handleQuickUpdate,
@@ -36,12 +42,7 @@ export function useKeyboard({
   compact,
   setCompact,
   setHighlightedTaskId,
-  // refs（子コンポーネントの関数を呼ぶ）
   searchRef,
-  clearSelectionRef,
-  toggleOneRef,
-  deleteSelectedRef,
-  toggleAllRef,
 }) {
   useEffect(() => {
     // フィルターフォーカス中に j/k で選択肢を移動する
@@ -80,7 +81,7 @@ export function useKeyboard({
       if (e.key === 'Escape' && modalState === null) {
         if (filterFocusIndex !== null) { setFilterFocusIndex(null); return }
         if (focusedTaskId) { setFocusedTaskId(null); return }
-        if (selectionCount > 0) { clearSelectionRef.current?.(); return }
+        if (selectedIds.length > 0) { clearSelection(); return }
         if (isFiltered) resetFilters()
         return
       }
@@ -137,8 +138,8 @@ export function useKeyboard({
 
       // d: 選択中タスクの一括削除 or フォーカス中タスクの削除
       if (e.key === 'd') {
-        if (selectionCount > 0) {
-          deleteSelectedRef.current?.()
+        if (selectedIds.length > 0) {
+          deleteSelected()
         } else if (focusedTaskId) {
           const task = filteredTasks.find((t) => t.id === focusedTaskId)
           if (task && window.confirm(`「${task.title}」を削除しますか？`)) {
@@ -171,7 +172,7 @@ export function useKeyboard({
       // Space: フォーカス中タスクのチェックボックスをトグル
       if (e.key === ' ' && filterFocusIndex === null && focusedTaskId) {
         e.preventDefault()
-        toggleOneRef.current?.(focusedTaskId)
+        toggleOne(focusedTaskId)
         return
       }
 
@@ -212,7 +213,7 @@ export function useKeyboard({
       // a: 全選択 / 全解除トグル
       if (e.key === 'a') {
         e.preventDefault()
-        toggleAllRef.current?.()
+        toggleAll()
         return
       }
 
@@ -252,10 +253,10 @@ export function useKeyboard({
     allTags,
     filteredTasks,
     focusedTaskId, setFocusedTaskId,
-    selectionCount,
+    selectedIds, clearSelection, toggleOne, toggleAll, deleteSelected,
     deleteTask, duplicateTask, handleQuickUpdate,
     compact, setCompact,
     setHighlightedTaskId,
-    searchRef, clearSelectionRef, toggleOneRef, deleteSelectedRef, toggleAllRef,
+    searchRef,
   ])
 }

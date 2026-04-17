@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.39.0] - 2026-04-17
+
+### Changed
+- 選択状態（selectedIds）の管理を `src/hooks/useSelection.js` カスタムフックに抽出
+  - TaskList が持っていた `selectedIds` state・登録 useEffect・関数（toggleOne / toggleAll / handleDeleteSelected）を削除
+  - `onRegisterClearSelection` / `onRegisterToggleOne` / `onRegisterDeleteSelected` / `onRegisterToggleAll` props（逆流 ref パターン）をすべて廃止
+  - `onSelectionChange` / `selectionCount` も廃止
+  - App.jsx で `useSelection` を呼び、`selection` オブジェクト1つを TaskList に渡す構成に変更
+  - `useKeyboard` は `clearSelectionRef` 等の ref ではなく、直接 `clearSelection` / `toggleOne` 等の関数を受け取るよう変更
+
 ## [1.38.0] - 2026-04-17
 
 ### Changed

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Trash2, Tag, X, LayoutList, AlignJustify, ChevronDown, ChevronRight } from 'lucide-react'
 import TaskCard from './TaskCard'
 import BulkTagModal from './BulkTagModal'
@@ -17,15 +17,12 @@ export default function TaskList({
   onDuplicate,
   highlightedTaskId,
   focusedTaskId,
-  onSelectionChange,
-  onRegisterClearSelection,
-  onRegisterToggleOne,
-  onRegisterDeleteSelected,
-  onRegisterToggleAll,
   compact,
   onToggleCompact,
+  selection,
 }) {
-  const [selectedIds, setSelectedIds] = useState([])
+  const { selectedIds, clearSelection, toggleOne, toggleAll, deleteSelected, removeFromSelection } = selection
+
   const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
   const [archiveOpen, setArchiveOpen] = useState(false)
 
@@ -35,59 +32,6 @@ export default function TaskList({
       setArchiveOpen(true)
     }
   }, [focusedTaskId, tasks])
-
-  // 選択件数を親に通知
-  useEffect(() => {
-    onSelectionChange?.(selectedIds.length)
-  }, [selectedIds])
-
-  // 外部から選択をクリアできるように関数を登録
-  useEffect(() => {
-    onRegisterClearSelection?.(() => setSelectedIds([]))
-  }, [])
-
-  // 外部から特定タスクの選択をトグルできるように関数を登録
-  useEffect(() => {
-    onRegisterToggleOne?.((id) => toggleOne(id))
-  }, [])
-
-  // 外部から全選択/全解除をトグルできるように関数を登録（toggleAll は tasks/selectedIds に依存するため ref 経由）
-  const toggleAllRef = useRef(toggleAll)
-  useEffect(() => { toggleAllRef.current = toggleAll })
-  useEffect(() => {
-    onRegisterToggleAll?.(() => toggleAllRef.current())
-  }, [])
-
-  // handleDeleteSelected は selectedIds に依存して毎レンダーで再生成されるため、
-  // ref に最新版を保持し、登録した関数は常に ref 経由で呼ぶことで古いクロージャを防ぐ
-  const handleDeleteSelectedRef = useRef(handleDeleteSelected)
-  useEffect(() => { handleDeleteSelectedRef.current = handleDeleteSelected })
-  useEffect(() => {
-    onRegisterDeleteSelected?.(() => handleDeleteSelectedRef.current())
-  }, [])
-
-  // フィルター結果が変わったとき、表示外のIDを選択から除外
-  const visibleIds = new Set(tasks.map((t) => t.id))
-  const validSelected = selectedIds.filter((id) => visibleIds.has(id))
-  if (validSelected.length !== selectedIds.length) {
-    setSelectedIds(validSelected)
-  }
-
-  function toggleOne(id) {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    )
-  }
-
-  function toggleAll() {
-    setSelectedIds(selectedIds.length > 0 ? [] : tasks.map((t) => t.id))
-  }
-
-  function handleDeleteSelected() {
-    if (!window.confirm(`選択した ${selectedIds.length} 件のタスクを削除しますか？`)) return
-    onDeleteMany(selectedIds)
-    setSelectedIds([])
-  }
 
   function handleBulkTagApply(tag) {
     if (bulkTagMode === 'add') onAddTagToMany(selectedIds, tag)
@@ -134,7 +78,7 @@ export default function TaskList({
               </label>
               {selectedIds.length > 0 && (
                 <button
-                  onClick={() => setSelectedIds([])}
+                  onClick={clearSelection}
                   className="flex items-center gap-0.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
                   title="選択を解除"
                 >
@@ -160,7 +104,7 @@ export default function TaskList({
                   タグを削除
                 </button>
                 <button
-                  onClick={handleDeleteSelected}
+                  onClick={deleteSelected}
                   className="flex items-center gap-1.5 text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg transition-colors"
                 >
                   <Trash2 size={14} />
@@ -181,7 +125,7 @@ export default function TaskList({
                 onEdit={onEdit}
                 onDelete={(id) => {
                   onDelete(id)
-                  setSelectedIds((prev) => prev.filter((x) => x !== id))
+                  removeFromSelection(id)
                 }}
                 onTagClick={onTagClick}
                 onUpdate={onUpdate}
@@ -214,7 +158,7 @@ export default function TaskList({
                       onEdit={onEdit}
                       onDelete={(id) => {
                         onDelete(id)
-                        setSelectedIds((prev) => prev.filter((x) => x !== id))
+                        removeFromSelection(id)
                       }}
                       onTagClick={onTagClick}
                       onUpdate={onUpdate}

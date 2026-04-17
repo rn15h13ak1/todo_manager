@@ -7,6 +7,7 @@ import ShortcutModal from './components/ShortcutModal'
 import ConfirmModal from './components/ConfirmModal'
 import { useTasks } from './hooks/useTasks'
 import { useKeyboard } from './hooks/useKeyboard'
+import { useSelection } from './hooks/useSelection'
 
 export default function App() {
   const {
@@ -38,12 +39,16 @@ export default function App() {
   const [compact, setCompact] = useState(false)
   const [highlightedTaskId, setHighlightedTaskId] = useState(null)
   const [focusedTaskId, setFocusedTaskId] = useState(null)
-  const [selectionCount, setSelectionCount] = useState(0)
-  const clearSelectionRef = useRef(null)
-  const toggleOneRef = useRef(null)
-  const deleteSelectedRef = useRef(null)
-  const toggleAllRef = useRef(null)
   const searchRef = useRef(null)
+
+  const {
+    selectedIds,
+    clearSelection,
+    toggleOne,
+    toggleAll,
+    deleteSelected,
+    removeFromSelection,
+  } = useSelection(filteredTasks, deleteTasks)
 
   // フィルターフォーカス: null=未フォーカス, 0-4=各フィルター要素
   // 0:ステータス 1:優先度 2:タグ 3:ソート 4:期限切れのみ
@@ -66,11 +71,11 @@ export default function App() {
     allTags,
     filteredTasks,
     focusedTaskId, setFocusedTaskId,
-    selectionCount,
+    selectedIds, clearSelection, toggleOne, toggleAll, deleteSelected,
     deleteTask, duplicateTask, handleQuickUpdate,
     compact, setCompact,
     setHighlightedTaskId,
-    searchRef, clearSelectionRef, toggleOneRef, deleteSelectedRef, toggleAllRef,
+    searchRef,
   })
 
   function handleSave(formData) {
@@ -123,11 +128,7 @@ export default function App() {
         }}
         highlightedTaskId={highlightedTaskId}
         focusedTaskId={focusedTaskId}
-        onSelectionChange={setSelectionCount}
-        onRegisterClearSelection={(fn) => { clearSelectionRef.current = fn }}
-        onRegisterToggleOne={(fn) => { toggleOneRef.current = fn }}
-        onRegisterDeleteSelected={(fn) => { deleteSelectedRef.current = fn }}
-        onRegisterToggleAll={(fn) => { toggleAllRef.current = fn }}
+        selection={{ selectedIds, clearSelection, toggleOne, toggleAll, deleteSelected, removeFromSelection }}
       />
       {modalState !== null && (
         <TaskModal
