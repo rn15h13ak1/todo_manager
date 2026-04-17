@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { loadTasks, saveTasks } from '../utils/storage'
+import { getTodayString } from '../utils/date'
 
 const PRIORITY_ORDER = { high: 1, medium: 2, low: 3 }
 
@@ -92,8 +93,7 @@ export function useTasks() {
     setSortKey(INITIAL_SORT_KEY)
   }
 
-  const _now = new Date()
-  const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
+  const today = getTodayString()
 
   const allTags = useMemo(() => {
     const tagSet = new Set()

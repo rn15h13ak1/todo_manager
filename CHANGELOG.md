@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.42.0] - 2026-04-17
+
+### Changed
+- `useTasks.js` の今日日付計算（`_now` / 手書き3行）を `getTodayString()` に統一
+
 ## [1.41.0] - 2026-04-17
 
 ### Changed
