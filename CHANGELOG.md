@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.41.0] - 2026-04-17
+
+### Changed
+- TaskCard の今日日付計算（`_now` / `today` 3行）を `getTodayString()` 関数に抽出し `src/utils/date.js` に追加
+- ハイライト消去タイムアウト `2000` ms を `HIGHLIGHT_DURATION_MS` 定数として `src/utils/constants.js` に集約
+  - App.jsx（2か所）・useKeyboard.js（1か所）が定数を参照するよう変更
+
 ## [1.40.0] - 2026-04-17
 
 ### Changed

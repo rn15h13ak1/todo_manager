@@ -1,4 +1,12 @@
 /**
+ * 今日の日付を YYYY-MM-DD 形式の文字列で返す
+ */
+export function getTodayString() {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+}
+
+/**
  * YYYY-MM-DD 形式の日付文字列を今日との差を相対表示に変換する
  * 例: 「今日」「昨日」「明日」「3日前」「5日後」「2週間後」「1ヶ月前」
  */

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Trash2, Copy } from 'lucide-react'
 import { tagColor } from '../utils/tags'
-import { formatRelativeDate } from '../utils/date'
+import { formatRelativeDate, getTodayString } from '../utils/date'
 import { usePopover } from '../hooks/usePopover'
 
 const PRIORITY_BADGE = {
@@ -21,8 +21,7 @@ const STATUS_ORDER = ['todo', 'in_progress', 'done']
 const PRIORITY_ORDER = ['high', 'medium', 'low']
 
 export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onDuplicate, onTagClick, onUpdate, highlighted, focused, compact }) {
-  const _now = new Date()
-  const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
+  const today = getTodayString()
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== 'done'
 
   const cardRef = useRef(null)

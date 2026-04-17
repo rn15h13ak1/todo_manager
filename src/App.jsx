@@ -8,6 +8,7 @@ import ConfirmModal from './components/ConfirmModal'
 import { useTasks } from './hooks/useTasks'
 import { useKeyboard } from './hooks/useKeyboard'
 import { useSelection } from './hooks/useSelection'
+import { HIGHLIGHT_DURATION_MS } from './utils/constants'
 
 export default function App() {
   const {
@@ -57,7 +58,7 @@ export default function App() {
   function handleQuickUpdate(id, updates) {
     updateTask(id, updates)
     setHighlightedTaskId(id)
-    setTimeout(() => setHighlightedTaskId((cur) => (cur === id ? null : cur)), 2000)
+    setTimeout(() => setHighlightedTaskId((cur) => (cur === id ? null : cur)), HIGHLIGHT_DURATION_MS)
   }
 
   useKeyboard({
@@ -124,7 +125,7 @@ export default function App() {
         onDuplicate={(task) => {
           const newId = duplicateTask(task)
           setHighlightedTaskId(newId)
-          setTimeout(() => setHighlightedTaskId((cur) => (cur === newId ? null : cur)), 2000)
+          setTimeout(() => setHighlightedTaskId((cur) => (cur === newId ? null : cur)), HIGHLIGHT_DURATION_MS)
         }}
         highlightedTaskId={highlightedTaskId}
         focusedTaskId={focusedTaskId}

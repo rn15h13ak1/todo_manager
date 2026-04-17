@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { HIGHLIGHT_DURATION_MS } from '../utils/constants'
 
 const FILTER_COUNT = 5
 
@@ -205,7 +206,7 @@ export function useKeyboard({
         if (task) {
           const newId = duplicateTask(task)
           setHighlightedTaskId(newId)
-          setTimeout(() => setHighlightedTaskId((cur) => (cur === newId ? null : cur)), 2000)
+          setTimeout(() => setHighlightedTaskId((cur) => (cur === newId ? null : cur)), HIGHLIGHT_DURATION_MS)
         }
         return
       }
