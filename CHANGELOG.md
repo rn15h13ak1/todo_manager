@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.60.0] - 2026-04-17
+
+### Changed
+- `FilterBar.jsx` の優先度 `<option>` を `PRIORITY_ORDER.map()` に変更し、`TaskModal.jsx` と統一
+
 ## [1.59.0] - 2026-04-17
 
 ### Fixed
