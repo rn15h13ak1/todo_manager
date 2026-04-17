@@ -32,6 +32,7 @@ export function useTasks() {
       createdAt: new Date().toISOString(),
     }
     setTasks((prev) => [...prev, task])
+    return task
   }
 
   function updateTask(id, updates) {

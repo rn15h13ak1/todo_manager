@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { STATUS } from '../utils/constants'
 import { Trash2, Tag, X, LayoutList, AlignJustify, ChevronDown, ChevronRight } from 'lucide-react'
 import TaskCard from './TaskCard'
@@ -44,33 +44,34 @@ export default function TaskList({
     removeFromSelection(id)
   }, [onDelete, removeFromSelection])
 
-  const activeTasks = tasks.filter((t) => t.status !== STATUS.DONE)
-  const doneTasks = tasks.filter((t) => t.status === STATUS.DONE)
+  const activeTasks = useMemo(() => tasks.filter((t) => t.status !== STATUS.DONE), [tasks])
+  const doneTasks = useMemo(() => tasks.filter((t) => t.status === STATUS.DONE), [tasks])
 
   const allChecked = tasks.length > 0 && selectedIds.length === tasks.length
   const someChecked = selectedIds.length > 0 && selectedIds.length < tasks.length
-  const selectedTasks = tasks.filter((t) => selectedIds.includes(t.id))
+  const selectedTasks = useMemo(
+    () => tasks.filter((t) => selectedIds.includes(t.id)),
+    [tasks, selectedIds]
+  )
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-6">
+    <main className="px-3">
       {tasks.length === 0 ? (
         <div className="text-center text-gray-400 py-20 text-sm">
           タスクがありません
         </div>
       ) : (
         <>
-          {/* 一括操作バー */}
-          <div className="flex items-center justify-between mb-3 px-1 flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={onToggleCompact}
-                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 border border-gray-300 hover:border-gray-400 rounded-md px-2 py-1 transition-colors"
-                title={compact ? '通常表示に切り替え' : 'コンパクト表示に切り替え'}
-              >
-                {compact ? <AlignJustify size={13} /> : <LayoutList size={13} />}
-                {compact ? '通常' : 'コンパクト'}
-              </button>
-            </div>
+          {/* 一括操作バー（sticky） */}
+          <div className="sticky top-0 z-10 bg-white border-b border-gray-100 -mx-3 px-4 pt-3 pb-2 mb-2 flex items-center justify-between flex-wrap gap-2">
+            <button
+              onClick={onToggleCompact}
+              className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 border border-gray-300 hover:border-gray-400 rounded-md px-2 py-1 transition-colors"
+              title={compact ? '通常表示に切り替え' : 'コンパクト表示に切り替え'}
+            >
+              {compact ? <AlignJustify size={13} /> : <LayoutList size={13} />}
+              {compact ? '通常' : 'コンパクト'}
+            </button>
             <div className="flex items-center gap-2">
               <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
                 <input
@@ -94,7 +95,7 @@ export default function TaskList({
               )}
             </div>
             {selectedIds.length > 0 && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setBulkTagMode('add')}
                   className="flex items-center gap-1.5 text-sm text-white bg-purple-500 hover:bg-purple-600 px-3 py-1.5 rounded-lg transition-colors"
@@ -121,7 +122,7 @@ export default function TaskList({
           </div>
 
           {/* アクティブタスク */}
-          <div className={`flex flex-col ${compact ? 'gap-1' : 'gap-3'}`}>
+          <div className={`flex flex-col pb-4 ${compact ? 'gap-1' : 'gap-3'}`}>
             {activeTasks.map((task) => (
               <TaskCard
                 key={task.id}

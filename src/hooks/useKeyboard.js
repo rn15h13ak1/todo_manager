@@ -7,9 +7,9 @@ import { deleteConfirmMessage } from '../utils/messages'
  * document レベルの keydown リスナーを登録・解除する。
  */
 export function useKeyboard({
-  // モーダル系
-  modalState,
-  setModalState,
+  // パネル系
+  panelState,
+  setPanelState,
   showShortcutModal,
   setShowShortcutModal,
   confirmToggle,
@@ -43,6 +43,12 @@ export function useKeyboard({
   setCompact,
   flashHighlight,
   searchRef,
+  // パネルフォーカス
+  isPanelFocused,
+  focusPanel,
+  onAddNew,
+  // タグ操作
+  openTagModal,
 }) {
   useEffect(() => {
     // フィルターフォーカス中に j/k で選択肢を移動する
@@ -77,27 +83,28 @@ export function useKeyboard({
         return
       }
 
-      // ESC: フィルターフォーカス解除 → タスクフォーカス解除 → チェックボックス解除 → フィルターリセット
-      if (e.key === 'Escape' && modalState === null) {
+      // ESC: フィルターフォーカス解除 → チェックボックス解除 → フィルターリセット
+      if (e.key === 'Escape' && !isPanelFocused) {
         if (filterFocusIndex !== null) { setFilterFocusIndex(null); return }
-        if (focusedTaskId) { setFocusedTaskId(null); return }
         if (selectedIds.length > 0) { clearSelection(); return }
         if (isFiltered) resetFilters()
         return
       }
 
-      // f: フィルターフォーカスを循環（入力中・モーダル表示中は無効）
-      if (e.key === 'f' && !isTyping && modalState === null) {
+      // f: フィルターフォーカスをトグル（入力中・右パネルフォーカス中は無効）
+      if (e.key === 'f' && !isTyping && !isPanelFocused) {
         e.preventDefault()
-        setFilterFocusIndex((prev) => prev === null ? 0 : (prev + 1) % FILTER_COUNT)
+        setFilterFocusIndex((prev) => prev === null ? 0 : null)
         setFocusedTaskId(null)
         return
       }
 
-      // フィルターフォーカスモード: j/k/Space をフィルター操作に使用
+      // フィルターフォーカスモード: j/k で項目移動、h/l で値変更、Space でチェックボックス切替
       if (filterFocusIndex !== null) {
-        if (e.key === 'j') { e.preventDefault(); moveFilterOption(1); return }
-        if (e.key === 'k') { e.preventDefault(); moveFilterOption(-1); return }
+        if (e.key === 'j') { e.preventDefault(); setFilterFocusIndex((i) => (i + 1) % FILTER_COUNT); return }
+        if (e.key === 'k') { e.preventDefault(); setFilterFocusIndex((i) => (i - 1 + FILTER_COUNT) % FILTER_COUNT); return }
+        if (e.key === 'l') { e.preventDefault(); moveFilterOption(1); return }
+        if (e.key === 'h') { e.preventDefault(); moveFilterOption(-1); return }
         if (e.key === ' ') {
           e.preventDefault()
           if (filterFocusIndex === 4) setFilters((f) => ({ ...f, overdueOnly: !f.overdueOnly }))
@@ -105,8 +112,34 @@ export function useKeyboard({
         }
       }
 
-      // 以下は入力中・モーダル表示中は無効
-      if (isTyping || modalState !== null || showShortcutModal || confirmToggle !== null) return
+      // l: 右パネルへフォーカス移動（パネルが開いていて入力中でない場合）
+      if (e.key === 'l' && panelState !== null && !isTyping) {
+        e.preventDefault()
+        focusPanel?.()
+        return
+      }
+
+      // j/k: タスクフォーカス移動（左パネルにフォーカスがある場合はパネルが開いていても有効）
+      if ((e.key === 'j' || e.key === 'k') && !isTyping && !isPanelFocused && filterFocusIndex === null && !showShortcutModal && confirmToggle === null) {
+        e.preventDefault()
+        if (filteredTasks.length === 0) return
+        setFocusedTaskId((prev) => {
+          const idx = filteredTasks.findIndex((t) => t.id === prev)
+          if (e.key === 'j') {
+            return idx === -1 || idx === filteredTasks.length - 1
+              ? filteredTasks[0].id
+              : filteredTasks[idx + 1].id
+          } else {
+            return idx <= 0
+              ? filteredTasks[filteredTasks.length - 1].id
+              : filteredTasks[idx - 1].id
+          }
+        })
+        return
+      }
+
+      // 以下は入力中・右パネルフォーカス中・モーダル表示中は無効
+      if (isTyping || isPanelFocused || showShortcutModal || confirmToggle !== null) return
 
       // /: 検索欄にフォーカス
       if (e.key === '/') {
@@ -129,10 +162,10 @@ export function useKeyboard({
         return
       }
 
-      // n: タスク追加モーダルを開く
+      // n: 新規タスクを作成してフォーカス
       if (e.key === 'n') {
         e.preventDefault()
-        setModalState({ task: null })
+        onAddNew?.()
         return
       }
 
@@ -147,25 +180,6 @@ export function useKeyboard({
             setFocusedTaskId(null)
           }
         }
-        return
-      }
-
-      // j/k: タスクフォーカス移動（フィルターフォーカスなし時のみ）
-      if ((e.key === 'j' || e.key === 'k') && filterFocusIndex === null) {
-        e.preventDefault()
-        if (filteredTasks.length === 0) return
-        setFocusedTaskId((prev) => {
-          const idx = filteredTasks.findIndex((t) => t.id === prev)
-          if (e.key === 'j') {
-            return idx === -1 || idx === filteredTasks.length - 1
-              ? filteredTasks[0].id
-              : filteredTasks[idx + 1].id
-          } else {
-            return idx <= 0
-              ? filteredTasks[filteredTasks.length - 1].id
-              : filteredTasks[idx - 1].id
-          }
-        })
         return
       }
 
@@ -187,14 +201,26 @@ export function useKeyboard({
         return
       }
 
-      // Enter: フォーカス中タスクの編集モーダルを開く
+      // Enter: フォーカス中タスクの右パネルへフォーカス移動
       if (e.key === 'Enter' && focusedTaskId) {
         e.preventDefault()
-        const task = filteredTasks.find((t) => t.id === focusedTaskId)
-        if (task) {
-          setModalState({ task })
-          setFocusedTaskId(null)
-        }
+        focusPanel?.()
+        return
+      }
+
+      // t: 選択中 or フォーカス中タスクにタグを追加
+      if (e.key === 't' && (selectedIds.length > 0 || focusedTaskId)) {
+        e.preventDefault()
+        const ids = selectedIds.length > 0 ? selectedIds : [focusedTaskId]
+        openTagModal?.('add', ids)
+        return
+      }
+
+      // T: 選択中 or フォーカス中タスクからタグを削除
+      if (e.key === 'T' && (selectedIds.length > 0 || focusedTaskId)) {
+        e.preventDefault()
+        const ids = selectedIds.length > 0 ? selectedIds : [focusedTaskId]
+        openTagModal?.('remove', ids)
         return
       }
 
@@ -242,7 +268,7 @@ export function useKeyboard({
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [
-    modalState, setModalState,
+    panelState, setPanelState,
     showShortcutModal, setShowShortcutModal,
     confirmToggle, setConfirmToggle,
     filters, setFilters,
@@ -257,5 +283,7 @@ export function useKeyboard({
     compact, setCompact,
     flashHighlight,
     searchRef,
+    isPanelFocused, focusPanel, onAddNew,
+    openTagModal,
   ])
 }

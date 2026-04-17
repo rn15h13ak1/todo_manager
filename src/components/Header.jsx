@@ -1,15 +1,14 @@
-import { useState } from 'react'
+import { memo, useMemo } from 'react'
 import { PlusCircle, ClipboardList } from 'lucide-react'
-import ChangelogModal from './ChangelogModal'
 import HamburgerMenu from './HamburgerMenu'
 import { STATUS } from '../utils/constants'
 
-export default function Header({ onAdd, allTasks, filteredTasks, onImport }) {
-  const [showChangelog, setShowChangelog] = useState(false)
-
-  const todoCount = allTasks.filter((t) => t.status === STATUS.TODO).length
-  const inProgressCount = allTasks.filter((t) => t.status === STATUS.IN_PROGRESS).length
-  const doneCount = allTasks.filter((t) => t.status === STATUS.DONE).length
+const Header = memo(function Header({ onAdd, allTasks, filteredTasks, onImport, onShowChangelog }) {
+  const { todoCount, inProgressCount, doneCount } = useMemo(() => ({
+    todoCount:       allTasks.filter((t) => t.status === STATUS.TODO).length,
+    inProgressCount: allTasks.filter((t) => t.status === STATUS.IN_PROGRESS).length,
+    doneCount:       allTasks.filter((t) => t.status === STATUS.DONE).length,
+  }), [allTasks])
 
   return (
     <header className="bg-white shadow-sm">
@@ -18,7 +17,7 @@ export default function Header({ onAdd, allTasks, filteredTasks, onImport }) {
           <ClipboardList className="text-blue-600" size={24} />
           <h1 className="text-xl font-bold text-gray-800">todo-manager</h1>
           <button
-            onClick={() => setShowChangelog(true)}
+            onClick={onShowChangelog}
             className="text-xs text-gray-400 font-mono hover:text-blue-500 transition-colors"
           >
             v{__APP_VERSION__}
@@ -41,7 +40,6 @@ export default function Header({ onAdd, allTasks, filteredTasks, onImport }) {
             <span className="font-semibold text-green-700">{doneCount}</span>
           </span>
         </div>
-        {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onAdd}
@@ -59,4 +57,6 @@ export default function Header({ onAdd, allTasks, filteredTasks, onImport }) {
       </div>
     </header>
   )
-}
+})
+
+export default Header

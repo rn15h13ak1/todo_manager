@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { loadPresets, savePresets } from '../utils/storage'
 import { FILTER_STATUS, STATUS, SORT_KEY } from '../utils/constants'
 import { PRIORITY_ORDER, PRIORITY_LABEL } from '../utils/labels'
@@ -7,7 +7,7 @@ import { usePopover } from '../hooks/usePopover'
 // フィルターフォーカスインデックス: 0=ステータス 1=優先度 2=タグ 3=ソート 4=期限切れのみ
 const FILTER_FOCUS_RING = 'ring-2 ring-blue-500 outline-none'
 
-export default function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags, isFiltered, onReset, filterFocusIndex, searchRef }) {
+const FilterBar = memo(function FilterBar({ filters, setFilters, sortKey, setSortKey, allTags, isFiltered, onReset, filterFocusIndex, searchRef, onSearchFocus, onSearchBlur, onSearchConfirm }) {
   const fi = filterFocusIndex  // 短縮
 
   const [presets, setPresets] = useState(() => loadPresets())
@@ -61,9 +61,14 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
             onChange={(e) => setFilters((f) => ({ ...f, searchText: e.target.value }))}
             placeholder="🔍 タイトル・説明を検索"
             className="text-sm border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onFocus={() => onSearchFocus?.()}
+            onBlur={() => onSearchBlur?.()}
             onKeyDown={(e) => {
-              // Esc / Enter でフォーカスを外す（検索テキストは維持、j/k 操作に戻れる）
-              if (e.key === 'Escape' || e.key === 'Enter') {
+              if (e.key === 'Enter') {
+                e.stopPropagation()
+                searchRef.current?.blur()
+                onSearchConfirm?.()
+              } else if (e.key === 'Escape') {
                 e.stopPropagation()
                 searchRef.current?.blur()
               }
@@ -211,4 +216,6 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
       </div>
     </div>
   )
-}
+})
+
+export default FilterBar

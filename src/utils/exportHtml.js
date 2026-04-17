@@ -1,4 +1,5 @@
 import { generateTimestamp } from './date'
+import { downloadFile } from './download'
 import { PRIORITY_LABEL, STATUS_LABEL } from './labels'
 
 function escapeHtml(str) {
@@ -56,18 +57,5 @@ export function exportHtml(tasks) {
 </body>
 </html>`
 
-  const timestamp = generateTimestamp()
-
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `todo-manager_${timestamp}.html`
-  document.body.appendChild(a)
-  try {
-    a.click()
-  } finally {
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
+  downloadFile(html, `todo-manager_${generateTimestamp()}.html`, 'text/html;charset=utf-8')
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react'
+import { useState, useEffect, useRef, useCallback, memo } from 'react'
 import { Trash2, Copy } from 'lucide-react'
 import { tagColor } from '../utils/tags'
 import { formatRelativeDate, getTodayString } from '../utils/date'
@@ -6,6 +6,58 @@ import { usePopover } from '../hooks/usePopover'
 import { PRIORITY_LABEL, PRIORITY_BADGE, PRIORITY_ORDER, STATUS_LABEL, STATUS_BADGE, STATUS_ORDER } from '../utils/labels'
 import { STATUS } from '../utils/constants'
 import { deleteConfirmMessage } from '../utils/messages'
+
+/**
+ * 優先度・ステータス共通のバッジ型ドロップダウンメニュー
+ * @param {{ value, order, labelMap, badgeMap, blockEditRef, onSelect, title }} props
+ */
+function BadgeMenu({ value, order, labelMap, badgeMap, blockEditRef, onSelect, title }) {
+  const menu = usePopover(blockEditRef)
+
+  useEffect(() => {
+    if (!menu.open) return
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') {
+        menu.setOpen(false)
+        e.stopImmediatePropagation()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [menu.open])
+
+  return (
+    <div className="relative" ref={menu.ref}>
+      <button
+        onClick={(e) => { e.stopPropagation(); menu.setOpen((v) => !v) }}
+        className={`text-xs px-2 py-0.5 rounded-full font-medium cursor-pointer hover:opacity-80 hover:ring-1 hover:ring-current transition-opacity ${badgeMap[value]}`}
+        title={title}
+      >
+        {labelMap[value]}
+      </button>
+      {menu.open && (
+        <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[5rem]">
+          {order.map((item) => (
+            <button
+              key={item}
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelect(item)
+                menu.setOpen(false)
+              }}
+              className={`w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors ${item === value ? 'font-bold' : ''}`}
+            >
+              <span className={`inline-block px-2 py-0.5 rounded-full font-medium ${badgeMap[item]}`}>
+                {labelMap[item]}
+              </span>
+              {item === value && <span className="ml-1 text-gray-400">✓</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 const TaskCard = memo(function TaskCard({ task, selected, onToggle, onEdit, onDelete, onDuplicate, onTagClick, onUpdate, highlighted, focused, compact }) {
   const today = getTodayString()
@@ -15,25 +67,15 @@ const TaskCard = memo(function TaskCard({ task, selected, onToggle, onEdit, onDe
   // ポップオーバーを外側クリックで閉じた直後にカードクリックが発火しないようにするフラグ
   const blockEditRef = useRef(false)
 
-  // sticky ヘッダー分のオフセットを考慮してカードを見える位置にスクロールする
+  // パネル内スクロールに対応してカードを見える位置にスクロールする
   function scrollCardIntoView(el) {
-    const stickyEl = document.getElementById('app-header')
-    const headerHeight = stickyEl ? stickyEl.getBoundingClientRect().height : 0
-    const rect = el.getBoundingClientRect()
-    const MARGIN = 8
-    if (rect.top < headerHeight + MARGIN) {
-      window.scrollTo({ top: window.scrollY + rect.top - headerHeight - MARGIN, behavior: 'smooth' })
-    } else if (rect.bottom > window.innerHeight - MARGIN) {
-      window.scrollTo({ top: window.scrollY + rect.bottom - window.innerHeight + MARGIN, behavior: 'smooth' })
-    }
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }
 
   useEffect(() => {
     if ((highlighted || focused) && cardRef.current) scrollCardIntoView(cardRef.current)
   }, [highlighted, focused, compact])
 
-  const statusMenu   = usePopover(blockEditRef)
-  const priorityMenu = usePopover(blockEditRef)
   const dueDateMenu  = usePopover(blockEditRef)
 
   const dueDateInputRef = useRef(null)
@@ -43,13 +85,11 @@ const TaskCard = memo(function TaskCard({ task, selected, onToggle, onEdit, onDe
   const [titleDraft, setTitleDraft] = useState('')
   const titleInputRef = useRef(null)
 
-  // いずれかのポップオーバーが開いている間、ESC で閉じる
+  // dueDateMenu が開いている間、ESC で閉じる
   useEffect(() => {
-    if (!statusMenu.open && !priorityMenu.open && !dueDateMenu.open) return
+    if (!dueDateMenu.open) return
     function handleKeyDown(e) {
       if (e.key === 'Escape') {
-        statusMenu.setOpen(false)
-        priorityMenu.setOpen(false)
         dueDateMenu.setOpen(false)
         // App.jsx のフィルターリセット（ESC）が同時に発火しないようにする
         e.stopImmediatePropagation()
@@ -57,7 +97,7 @@ const TaskCard = memo(function TaskCard({ task, selected, onToggle, onEdit, onDe
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [statusMenu.open, priorityMenu.open, dueDateMenu.open])
+  }, [dueDateMenu.open])
 
   return (
     <div
@@ -122,68 +162,24 @@ const TaskCard = memo(function TaskCard({ task, selected, onToggle, onEdit, onDe
             </h3>
           )}
           <div className="flex gap-1 shrink-0 flex-wrap justify-end">
-            <div className="relative" ref={priorityMenu.ref}>
-              <button
-                onClick={(e) => { e.stopPropagation(); priorityMenu.setOpen((v) => !v) }}
-                className={`text-xs px-2 py-0.5 rounded-full font-medium cursor-pointer hover:opacity-80 hover:ring-1 hover:ring-current transition-opacity ${PRIORITY_BADGE[task.priority]}`}
-                title="クリックで優先度変更"
-              >
-                {PRIORITY_LABEL[task.priority]}
-              </button>
-              {priorityMenu.open && (
-                <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[5rem]">
-                  {PRIORITY_ORDER.map((p) => (
-                    <button
-                      key={p}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onUpdate?.(task.id, { priority: p })
-                        priorityMenu.setOpen(false)
-                      }}
-                      className={`w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors ${
-                        p === task.priority ? 'font-bold' : ''
-                      }`}
-                    >
-                      <span className={`inline-block px-2 py-0.5 rounded-full font-medium ${PRIORITY_BADGE[p]}`}>
-                        {PRIORITY_LABEL[p]}
-                      </span>
-                      {p === task.priority && <span className="ml-1 text-gray-400">✓</span>}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="relative" ref={statusMenu.ref}>
-              <button
-                onClick={(e) => { e.stopPropagation(); statusMenu.setOpen((v) => !v) }}
-                className={`text-xs px-2 py-0.5 rounded-full font-medium cursor-pointer hover:opacity-80 hover:ring-1 hover:ring-current transition-opacity ${STATUS_BADGE[task.status]}`}
-                title="クリックでステータス変更"
-              >
-                {STATUS_LABEL[task.status]}
-              </button>
-              {statusMenu.open && (
-                <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[6rem]">
-                  {STATUS_ORDER.map((s) => (
-                    <button
-                      key={s}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onUpdate?.(task.id, { status: s })
-                        statusMenu.setOpen(false)
-                      }}
-                      className={`w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors ${
-                        s === task.status ? 'font-bold' : ''
-                      }`}
-                    >
-                      <span className={`inline-block px-2 py-0.5 rounded-full font-medium ${STATUS_BADGE[s]}`}>
-                        {STATUS_LABEL[s]}
-                      </span>
-                      {s === task.status && <span className="ml-1 text-gray-400">✓</span>}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <BadgeMenu
+              value={task.priority}
+              order={PRIORITY_ORDER}
+              labelMap={PRIORITY_LABEL}
+              badgeMap={PRIORITY_BADGE}
+              blockEditRef={blockEditRef}
+              onSelect={(p) => onUpdate?.(task.id, { priority: p })}
+              title="クリックで優先度変更"
+            />
+            <BadgeMenu
+              value={task.status}
+              order={STATUS_ORDER}
+              labelMap={STATUS_LABEL}
+              badgeMap={STATUS_BADGE}
+              blockEditRef={blockEditRef}
+              onSelect={(s) => onUpdate?.(task.id, { status: s })}
+              title="クリックでステータス変更"
+            />
           </div>
         </div>
 
