@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.40.0] - 2026-04-17
+
+### Changed
+- TaskCard の3つのポップオーバー（優先度・ステータス・期限日）に共通の `usePopover` フックを導入
+  - `src/hooks/usePopover.js` を新規作成
+  - 3×(useState + useRef + useEffect) ≒ 36行を `usePopover` 3呼び出しに圧縮
+  - 外側クリックで閉じる処理・blockEditRef リセットをフックに集約
+
 ## [1.39.0] - 2026-04-17
 
 ### Changed

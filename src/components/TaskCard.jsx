@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Trash2, Copy } from 'lucide-react'
 import { tagColor } from '../utils/tags'
 import { formatRelativeDate } from '../utils/date'
+import { usePopover } from '../hooks/usePopover'
 
 const PRIORITY_BADGE = {
   high: 'bg-red-100 text-red-700',
@@ -49,14 +50,10 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
     if (focused && cardRef.current) scrollCardIntoView(cardRef.current)
   }, [focused, compact])
 
-  const [showStatusMenu, setShowStatusMenu] = useState(false)
-  const statusMenuRef = useRef(null)
+  const statusMenu   = usePopover(blockEditRef)
+  const priorityMenu = usePopover(blockEditRef)
+  const dueDateMenu  = usePopover(blockEditRef)
 
-  const [showPriorityMenu, setShowPriorityMenu] = useState(false)
-  const priorityMenuRef = useRef(null)
-
-  const [showDueDateMenu, setShowDueDateMenu] = useState(false)
-  const dueDateMenuRef = useRef(null)
   const dueDateInputRef = useRef(null)
 
   // タイトルインライン編集
@@ -64,60 +61,21 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
   const [titleDraft, setTitleDraft] = useState('')
   const titleInputRef = useRef(null)
 
-  useEffect(() => {
-    if (!showStatusMenu) return
-    function handleClick(e) {
-      if (statusMenuRef.current && !statusMenuRef.current.contains(e.target)) {
-        setShowStatusMenu(false)
-        blockEditRef.current = true
-        setTimeout(() => { blockEditRef.current = false }, 0)
-      }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [showStatusMenu])
-
-  useEffect(() => {
-    if (!showPriorityMenu) return
-    function handleClick(e) {
-      if (priorityMenuRef.current && !priorityMenuRef.current.contains(e.target)) {
-        setShowPriorityMenu(false)
-        blockEditRef.current = true
-        setTimeout(() => { blockEditRef.current = false }, 0)
-      }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [showPriorityMenu])
-
-  useEffect(() => {
-    if (!showDueDateMenu) return
-    function handleClick(e) {
-      if (dueDateMenuRef.current && !dueDateMenuRef.current.contains(e.target)) {
-        setShowDueDateMenu(false)
-        blockEditRef.current = true
-        setTimeout(() => { blockEditRef.current = false }, 0)
-      }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [showDueDateMenu])
-
   // いずれかのポップオーバーが開いている間、ESC で閉じる
   useEffect(() => {
-    if (!showStatusMenu && !showPriorityMenu && !showDueDateMenu) return
+    if (!statusMenu.open && !priorityMenu.open && !dueDateMenu.open) return
     function handleKeyDown(e) {
       if (e.key === 'Escape') {
-        setShowStatusMenu(false)
-        setShowPriorityMenu(false)
-        setShowDueDateMenu(false)
+        statusMenu.setOpen(false)
+        priorityMenu.setOpen(false)
+        dueDateMenu.setOpen(false)
         // App.jsx のフィルターリセット（ESC）が同時に発火しないようにする
         e.stopImmediatePropagation()
       }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [showStatusMenu, showPriorityMenu, showDueDateMenu])
+  }, [statusMenu.open, priorityMenu.open, dueDateMenu.open])
 
   return (
     <div
@@ -182,15 +140,15 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
             </h3>
           )}
           <div className="flex gap-1 shrink-0 flex-wrap justify-end">
-            <div className="relative" ref={priorityMenuRef}>
+            <div className="relative" ref={priorityMenu.ref}>
               <button
-                onClick={(e) => { e.stopPropagation(); setShowPriorityMenu((v) => !v) }}
+                onClick={(e) => { e.stopPropagation(); priorityMenu.setOpen((v) => !v) }}
                 className={`text-xs px-2 py-0.5 rounded-full font-medium cursor-pointer hover:opacity-80 hover:ring-1 hover:ring-current transition-opacity ${PRIORITY_BADGE[task.priority]}`}
                 title="クリックで優先度変更"
               >
                 {PRIORITY_LABEL[task.priority]}
               </button>
-              {showPriorityMenu && (
+              {priorityMenu.open && (
                 <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[5rem]">
                   {PRIORITY_ORDER.map((p) => (
                     <button
@@ -198,7 +156,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                       onClick={(e) => {
                         e.stopPropagation()
                         onUpdate?.(task.id, { priority: p })
-                        setShowPriorityMenu(false)
+                        priorityMenu.setOpen(false)
                       }}
                       className={`w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors ${
                         p === task.priority ? 'font-bold' : ''
@@ -213,15 +171,15 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                 </div>
               )}
             </div>
-            <div className="relative" ref={statusMenuRef}>
+            <div className="relative" ref={statusMenu.ref}>
               <button
-                onClick={(e) => { e.stopPropagation(); setShowStatusMenu((v) => !v) }}
+                onClick={(e) => { e.stopPropagation(); statusMenu.setOpen((v) => !v) }}
                 className={`text-xs px-2 py-0.5 rounded-full font-medium cursor-pointer hover:opacity-80 hover:ring-1 hover:ring-current transition-opacity ${STATUS_BADGE[task.status]}`}
                 title="クリックでステータス変更"
               >
                 {STATUS_LABEL[task.status]}
               </button>
-              {showStatusMenu && (
+              {statusMenu.open && (
                 <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[6rem]">
                   {STATUS_ORDER.map((s) => (
                     <button
@@ -229,7 +187,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                       onClick={(e) => {
                         e.stopPropagation()
                         onUpdate?.(task.id, { status: s })
-                        setShowStatusMenu(false)
+                        statusMenu.setOpen(false)
                       }}
                       className={`w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors ${
                         s === task.status ? 'font-bold' : ''
@@ -268,9 +226,9 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
 
         {!compact && (
         <div className="flex items-center justify-between mt-1">
-          <div className="relative" ref={dueDateMenuRef}>
+          <div className="relative" ref={dueDateMenu.ref}>
             <button
-              onClick={(e) => { e.stopPropagation(); setShowDueDateMenu((v) => !v) }}
+              onClick={(e) => { e.stopPropagation(); dueDateMenu.setOpen((v) => !v) }}
               onDoubleClick={(e) => e.stopPropagation()}
               className={`text-xs hover:underline cursor-pointer ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}
               title={task.dueDate ? `${task.dueDate}（クリックで期限を変更）` : 'クリックで期限を設定'}
@@ -279,7 +237,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                 ? `期限: ${formatRelativeDate(task.dueDate)} (${task.dueDate})${isOverdue ? '（期限切れ）' : ''}`
                 : '期限なし'}
             </button>
-            {showDueDateMenu && (
+            {dueDateMenu.open && (
               <div className="absolute left-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg p-3 flex flex-col gap-2 min-w-[11rem]">
                 <span className="text-xs text-gray-500 font-medium">期限日</span>
                 <input
@@ -295,7 +253,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                       e.stopPropagation()
                       const val = dueDateInputRef.current?.value || null
                       onUpdate?.(task.id, { dueDate: val })
-                      setShowDueDateMenu(false)
+                      dueDateMenu.setOpen(false)
                     }}
                     className="flex-1 text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
                   >
@@ -306,7 +264,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                       onClick={(e) => {
                         e.stopPropagation()
                         onUpdate?.(task.id, { dueDate: null })
-                        setShowDueDateMenu(false)
+                        dueDateMenu.setOpen(false)
                       }}
                       className="flex-1 text-xs text-red-500 border border-red-200 px-2 py-1 rounded hover:bg-red-50 transition-colors"
                     >
