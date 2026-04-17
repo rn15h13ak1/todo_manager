@@ -24,6 +24,7 @@ export default function TaskList({
   onRegisterClearSelection,
   onRegisterToggleOne,
   onRegisterDeleteSelected,
+  onRegisterToggleAll,
   compact,
   onToggleCompact,
 }) {
@@ -51,6 +52,13 @@ export default function TaskList({
   // 外部から特定タスクの選択をトグルできるように関数を登録
   useEffect(() => {
     onRegisterToggleOne?.((id) => toggleOne(id))
+  }, [])
+
+  // 外部から全選択/全解除をトグルできるように関数を登録（toggleAll は tasks/selectedIds に依存するため ref 経由）
+  const toggleAllRef = useRef(toggleAll)
+  useEffect(() => { toggleAllRef.current = toggleAll })
+  useEffect(() => {
+    onRegisterToggleAll?.(() => toggleAllRef.current())
   }, [])
 
   // handleDeleteSelected は selectedIds に依存して毎レンダーで再生成されるため、

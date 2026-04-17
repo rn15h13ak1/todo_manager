@@ -41,6 +41,7 @@ export default function App() {
   const clearSelectionRef = useRef(null)
   const toggleOneRef = useRef(null)
   const deleteSelectedRef = useRef(null)
+  const toggleAllRef = useRef(null)
   const searchRef = useRef(null)
 
   // フィルターフォーカス: null=未フォーカス, 0-4=各フィルター要素
@@ -207,6 +208,48 @@ export default function App() {
           setModalState({ task })
           setFocusedTaskId(null)
         }
+        return
+      }
+
+      // y: フォーカス中タスクを複製
+      if (e.key === 'y' && focusedTaskId) {
+        e.preventDefault()
+        const task = filteredTasks.find((t) => t.id === focusedTaskId)
+        if (task) {
+          const newId = duplicateTask(task)
+          setHighlightedTaskId(newId)
+          setTimeout(() => setHighlightedTaskId((cur) => (cur === newId ? null : cur)), 2000)
+        }
+        return
+      }
+
+      // a: 全選択 / 全解除トグル
+      if (e.key === 'a') {
+        e.preventDefault()
+        toggleAllRef.current?.()
+        return
+      }
+
+      // g: 先頭タスクへジャンプ
+      if (e.key === 'g') {
+        e.preventDefault()
+        if (filteredTasks.length > 0) setFocusedTaskId(filteredTasks[0].id)
+        return
+      }
+
+      // G: 末尾タスクへジャンプ
+      if (e.key === 'G') {
+        e.preventDefault()
+        if (filteredTasks.length > 0) setFocusedTaskId(filteredTasks[filteredTasks.length - 1].id)
+        return
+      }
+
+      // 1/2/3: フォーカス中タスクの優先度を 高/中/低 に変更
+      if ((e.key === '1' || e.key === '2' || e.key === '3') && focusedTaskId) {
+        e.preventDefault()
+        const priority = e.key === '1' ? 'high' : e.key === '2' ? 'medium' : 'low'
+        handleQuickUpdate(focusedTaskId, { priority })
+        return
       }
     }
     document.addEventListener('keydown', handleKeyDown)
@@ -271,6 +314,7 @@ export default function App() {
         onRegisterClearSelection={(fn) => { clearSelectionRef.current = fn }}
         onRegisterToggleOne={(fn) => { toggleOneRef.current = fn }}
         onRegisterDeleteSelected={(fn) => { deleteSelectedRef.current = fn }}
+        onRegisterToggleAll={(fn) => { toggleAllRef.current = fn }}
       />
       {modalState !== null && (
         <TaskModal
