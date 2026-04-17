@@ -1,22 +1,12 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef } from 'react'
 import { Menu, X, FileUp, FileDown } from 'lucide-react'
 import { exportJson } from '../utils/exportJson'
 import { exportHtml } from '../utils/exportHtml'
+import { usePopover } from '../hooks/usePopover'
 
 export default function HamburgerMenu({ allTasks, filteredTasks, onImport }) {
-  const [open, setOpen] = useState(false)
+  const { open, setOpen, ref } = usePopover()
   const fileInputRef = useRef(null)
-  const menuRef = useRef(null)
-
-  // メニュー外クリックで閉じる
-  useEffect(() => {
-    if (!open) return
-    function handleClick(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [open])
 
   function handleImport(e) {
     const file = e.target.files[0]
@@ -38,7 +28,7 @@ export default function HamburgerMenu({ allTasks, filteredTasks, onImport }) {
   }
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"

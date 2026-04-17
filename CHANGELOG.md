@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.50.0] - 2026-04-17
+
+### Changed
+- `HamburgerMenu.jsx` の外側クリック閉じを `usePopover` フックに統合（独自 `useEffect` + `useRef` を削除）
+
 ## [1.49.0] - 2026-04-17
 
 ### Changed
