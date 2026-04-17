@@ -28,3 +28,6 @@ export const SORT_KEY = {
   PRIORITY:      'priority',
   CREATED_AT:    'createdAt',
 }
+
+/** FilterBar のフィルター項目数（0:ステータス 1:優先度 2:タグ 3:ソート 4:期限切れのみ） */
+export const FILTER_COUNT = 5

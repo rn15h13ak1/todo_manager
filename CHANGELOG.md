@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.54.0] - 2026-04-17
+
+### Changed
+- `FILTER_COUNT` を `useKeyboard.js` のローカル定数から `constants.js` に移動
+
 ## [1.53.0] - 2026-04-17
 
 ### Changed

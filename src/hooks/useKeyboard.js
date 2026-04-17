@@ -1,8 +1,6 @@
 import { useEffect } from 'react'
-import { STATUS, PRIORITY, FILTER_STATUS, SORT_KEY } from '../utils/constants'
+import { STATUS, PRIORITY, FILTER_STATUS, SORT_KEY, FILTER_COUNT } from '../utils/constants'
 import { deleteConfirmMessage } from '../utils/messages'
-
-const FILTER_COUNT = 5
 
 /**
  * アプリ全体のキーボードショートカットを管理するフック。
