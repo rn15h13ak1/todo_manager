@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import ModalBackdrop from './ModalBackdrop'
 
 export default function ConfirmModal({ message, confirmLabel, onConfirm, onCancel }) {
   const confirmBtnRef = useRef(null)
@@ -18,10 +19,7 @@ export default function ConfirmModal({ message, confirmLabel, onConfirm, onCance
   }, [onConfirm, onCancel])
 
   return (
-    <div
-      className="fixed inset-0 bg-black/30 flex items-center justify-center z-50"
-      onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel() }}
-    >
+    <ModalBackdrop onClose={onCancel} className="">
       <div className="bg-white rounded-xl shadow-xl px-6 py-5 w-full max-w-sm mx-4">
         <p className="text-sm text-gray-700 mb-4 leading-relaxed">{message}</p>
         <div className="flex justify-end gap-2">
@@ -40,6 +38,6 @@ export default function ConfirmModal({ message, confirmLabel, onConfirm, onCance
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   )
 }

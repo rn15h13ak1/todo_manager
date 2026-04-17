@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.49.0] - 2026-04-17
+
+### Changed
+- `ModalBackdrop` コンポーネントを新規作成し、5つのモーダルの背景オーバーレイを共通化
+  - `onClick` で背景クリック閉じを統一（`onMouseDown` の揺れも解消）
+  - 対象: TaskModal / BulkTagModal / ConfirmModal / ShortcutModal / ChangelogModal
+
 ## [1.48.1] - 2026-04-17
 
 ### Fixed

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { X, Plus } from 'lucide-react'
 import { tagColor } from '../utils/tags'
 import { STATUS, PRIORITY } from '../utils/constants'
+import ModalBackdrop from './ModalBackdrop'
 
 const EMPTY_FORM = {
   title: '',
@@ -229,10 +230,7 @@ export default function TaskModal({ task, allTags, onSave, onClose }) {
     : 'j/k: 移動　Enter: 編集　Esc: 閉じる'
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
+    <ModalBackdrop onClose={onClose}>
       <div
         ref={containerRef}
         tabIndex={-1}
@@ -413,6 +411,6 @@ export default function TaskModal({ task, allTags, onSave, onClose }) {
           </div>
         </form>
       </div>
-    </div>
+    </ModalBackdrop>
   )
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X, Plus, ArrowLeft } from 'lucide-react'
 import { tagColor } from '../utils/tags'
+import ModalBackdrop from './ModalBackdrop'
 
 export default function BulkTagModal({ mode, selectedTasks, allTags, onApply, onClose }) {
   const [input, setInput] = useState('')
@@ -30,10 +31,7 @@ export default function BulkTagModal({ mode, selectedTasks, allTags, onApply, on
       : `タグを一括削除（${selectedTasks.length}件）`
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
+    <ModalBackdrop onClose={onClose}>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm">
         {/* ヘッダー */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
@@ -151,6 +149,6 @@ export default function BulkTagModal({ mode, selectedTasks, allTags, onApply, on
           )}
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   )
 }
