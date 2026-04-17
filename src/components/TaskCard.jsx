@@ -1,12 +1,13 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import { Trash2, Copy } from 'lucide-react'
 import { tagColor } from '../utils/tags'
 import { formatRelativeDate, getTodayString } from '../utils/date'
 import { usePopover } from '../hooks/usePopover'
 import { PRIORITY_LABEL, PRIORITY_BADGE, PRIORITY_ORDER, STATUS_LABEL, STATUS_BADGE, STATUS_ORDER } from '../utils/labels'
 import { STATUS } from '../utils/constants'
+import { deleteConfirmMessage } from '../utils/messages'
 
-export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onDuplicate, onTagClick, onUpdate, highlighted, focused, compact }) {
+const TaskCard = memo(function TaskCard({ task, selected, onToggle, onEdit, onDelete, onDuplicate, onTagClick, onUpdate, highlighted, focused, compact }) {
   const today = getTodayString()
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== STATUS.DONE
 
@@ -268,7 +269,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
             <button
               onClick={(e) => {
                 e.stopPropagation()
-                if (window.confirm(`「${task.title}」を削除しますか？`)) {
+                if (window.confirm(deleteConfirmMessage(task.title))) {
                   onDelete(task.id)
                 }
               }}
@@ -283,4 +284,6 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
       </div>
     </div>
   )
-}
+})
+
+export default TaskCard

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { loadTasks, saveTasks } from '../utils/storage'
 import { getTodayString } from '../utils/date'
-import { STATUS, FILTER_STATUS } from '../utils/constants'
+import { STATUS, FILTER_STATUS, SORT_KEY } from '../utils/constants'
 
 // ソート用の重み（小さいほど優先度が高い）
 const PRIORITY_SORT_WEIGHT = { high: 1, medium: 2, low: 3 }
@@ -13,7 +13,7 @@ export const INITIAL_FILTERS = {
   overdueOnly: false,
   searchText: '',
 }
-export const INITIAL_SORT_KEY = 'dueDate_asc'
+export const INITIAL_SORT_KEY = SORT_KEY.DUE_DATE_ASC
 
 export function useTasks() {
   const [tasks, setTasks] = useState(() => loadTasks())
@@ -135,17 +135,17 @@ export function useTasks() {
       (PRIORITY_SORT_WEIGHT[a.priority] || 99) - (PRIORITY_SORT_WEIGHT[b.priority] || 99)
 
     return [...result].sort((a, b) => {
-      if (sortKey === 'dueDate_asc') {
+      if (sortKey === SORT_KEY.DUE_DATE_ASC) {
         const d = (a.dueDate || '9999').localeCompare(b.dueDate || '9999')
         return d !== 0 ? d : byPriority(a, b)
       }
-      if (sortKey === 'dueDate_desc') {
+      if (sortKey === SORT_KEY.DUE_DATE_DESC) {
         const d = (b.dueDate || '').localeCompare(a.dueDate || '')
         return d !== 0 ? d : byPriority(a, b)
       }
-      if (sortKey === 'priority')
+      if (sortKey === SORT_KEY.PRIORITY)
         return byPriority(a, b)
-      if (sortKey === 'createdAt')
+      if (sortKey === SORT_KEY.CREATED_AT)
         return (b.createdAt || '').localeCompare(a.createdAt || '')
       return 0
     })

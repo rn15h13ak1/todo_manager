@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.53.0] - 2026-04-17
+
+### Changed
+- `constants.js` に `SORT_KEY` 定数を追加し、`useTasks.js` / `useKeyboard.js` / `FilterBar.jsx` のソートキー文字列リテラルを統一（①）
+- `FilterBar.jsx` のステータス `<option>` 値を `STATUS` 定数に統一（②）
+- `TaskModal.jsx` の優先度・ステータス `<select>` を `PRIORITY_ORDER` / `STATUS_ORDER` の `.map()` に変更（③）
+- `useHighlight` フックを新規作成し、`App.jsx` と `useKeyboard.js` のハイライトアニメーション重複を解消（④）
+- `messages.js` を新規作成し、削除確認メッセージを共通化（`useKeyboard.js` / `TaskCard.jsx`）（⑤）
+- `TaskCard` を `React.memo` でラップし、`TaskList` の `handleDelete` / `handleBulkTagApply` を `useCallback` に変更（⑥）
+- `App.jsx` の `handleQuickUpdate` / `handleDuplicate` / `handleTagClick` を `useCallback` に変更（⑥）
+
 ## [1.52.0] - 2026-04-17
 
 ### Changed

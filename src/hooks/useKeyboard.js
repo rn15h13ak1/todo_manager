@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { HIGHLIGHT_DURATION_MS, STATUS, PRIORITY, FILTER_STATUS } from '../utils/constants'
+import { STATUS, PRIORITY, FILTER_STATUS, SORT_KEY } from '../utils/constants'
+import { deleteConfirmMessage } from '../utils/messages'
 
 const FILTER_COUNT = 5
 
@@ -42,7 +43,7 @@ export function useKeyboard({
   // UI 系
   compact,
   setCompact,
-  setHighlightedTaskId,
+  flashHighlight,
   searchRef,
 }) {
   useEffect(() => {
@@ -61,7 +62,7 @@ export function useKeyboard({
         const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(filters.tag) + delta))
         setFilters((f) => ({ ...f, tag: opts[next] }))
       } else if (filterFocusIndex === 3) {
-        const opts = ['dueDate_asc', 'dueDate_desc', 'priority', 'createdAt']
+        const opts = [SORT_KEY.DUE_DATE_ASC, SORT_KEY.DUE_DATE_DESC, SORT_KEY.PRIORITY, SORT_KEY.CREATED_AT]
         const next = Math.max(0, Math.min(opts.length - 1, opts.indexOf(sortKey) + delta))
         setSortKey(opts[next])
       }
@@ -143,7 +144,7 @@ export function useKeyboard({
           deleteSelected()
         } else if (focusedTaskId) {
           const task = filteredTasks.find((t) => t.id === focusedTaskId)
-          if (task && window.confirm(`「${task.title}」を削除しますか？`)) {
+          if (task && window.confirm(deleteConfirmMessage(task.title))) {
             deleteTask(focusedTaskId)
             setFocusedTaskId(null)
           }
@@ -205,8 +206,7 @@ export function useKeyboard({
         const task = filteredTasks.find((t) => t.id === focusedTaskId)
         if (task) {
           const newId = duplicateTask(task)
-          setHighlightedTaskId(newId)
-          setTimeout(() => setHighlightedTaskId((cur) => (cur === newId ? null : cur)), HIGHLIGHT_DURATION_MS)
+          flashHighlight(newId)
         }
         return
       }
@@ -257,7 +257,7 @@ export function useKeyboard({
     selectedIds, clearSelection, toggleOne, toggleAll, deleteSelected,
     deleteTask, duplicateTask, handleQuickUpdate,
     compact, setCompact,
-    setHighlightedTaskId,
+    flashHighlight,
     searchRef,
   ])
 }

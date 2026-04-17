@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { loadPresets, savePresets } from '../utils/storage'
-import { FILTER_STATUS } from '../utils/constants'
+import { FILTER_STATUS, STATUS, SORT_KEY } from '../utils/constants'
 
 // フィルターフォーカスインデックス: 0=ステータス 1=優先度 2=タグ 3=ソート 4=期限切れのみ
 const FILTER_FOCUS_RING = 'ring-2 ring-blue-500 outline-none'
@@ -72,9 +72,9 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
           >
             <option value={FILTER_STATUS.ALL}>すべて</option>
             <option value={FILTER_STATUS.NOT_DONE}>完了以外</option>
-            <option value="todo">未着手</option>
-            <option value="in_progress">進行中</option>
-            <option value="done">完了</option>
+            <option value={STATUS.TODO}>未着手</option>
+            <option value={STATUS.IN_PROGRESS}>進行中</option>
+            <option value={STATUS.DONE}>完了</option>
           </select>
         </div>
 
@@ -113,10 +113,10 @@ export default function FilterBar({ filters, setFilters, sortKey, setSortKey, al
             onChange={(e) => setSortKey(e.target.value)}
             className={`text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 ${fi === 3 ? FILTER_FOCUS_RING : ''}`}
           >
-            <option value="dueDate_asc">期限日（昇順）</option>
-            <option value="dueDate_desc">期限日（降順）</option>
-            <option value="priority">優先度</option>
-            <option value="createdAt">作成日（新しい順）</option>
+            <option value={SORT_KEY.DUE_DATE_ASC}>期限日（昇順）</option>
+            <option value={SORT_KEY.DUE_DATE_DESC}>期限日（降順）</option>
+            <option value={SORT_KEY.PRIORITY}>優先度</option>
+            <option value={SORT_KEY.CREATED_AT}>作成日（新しい順）</option>
           </select>
         </div>
 

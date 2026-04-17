@@ -20,3 +20,11 @@ export const PRIORITY = {
   MEDIUM: 'medium',
   LOW: 'low',
 }
+
+/** ソートキーの定数 */
+export const SORT_KEY = {
+  DUE_DATE_ASC:  'dueDate_asc',
+  DUE_DATE_DESC: 'dueDate_desc',
+  PRIORITY:      'priority',
+  CREATED_AT:    'createdAt',
+}

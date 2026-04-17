@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import Header from './components/Header'
 import FilterBar from './components/FilterBar'
 import TaskList from './components/TaskList'
@@ -8,7 +8,8 @@ import ConfirmModal from './components/ConfirmModal'
 import { useTasks } from './hooks/useTasks'
 import { useKeyboard } from './hooks/useKeyboard'
 import { useSelection } from './hooks/useSelection'
-import { HIGHLIGHT_DURATION_MS, STATUS } from './utils/constants'
+import { useHighlight } from './hooks/useHighlight'
+import { STATUS } from './utils/constants'
 
 export default function App() {
   const {
@@ -38,7 +39,7 @@ export default function App() {
   const [confirmToggle, setConfirmToggle] = useState(null)
 
   const [compact, setCompact] = useState(false)
-  const [highlightedTaskId, setHighlightedTaskId] = useState(null)
+  const { highlightedTaskId, flashHighlight } = useHighlight()
   const [focusedTaskId, setFocusedTaskId] = useState(null)
   const searchRef = useRef(null)
 
@@ -55,11 +56,19 @@ export default function App() {
   // 0:ステータス 1:優先度 2:タグ 3:ソート 4:期限切れのみ
   const [filterFocusIndex, setFilterFocusIndex] = useState(null)
 
-  function handleQuickUpdate(id, updates) {
+  const handleQuickUpdate = useCallback((id, updates) => {
     updateTask(id, updates)
-    setHighlightedTaskId(id)
-    setTimeout(() => setHighlightedTaskId((cur) => (cur === id ? null : cur)), HIGHLIGHT_DURATION_MS)
-  }
+    flashHighlight(id)
+  }, [updateTask, flashHighlight])
+
+  const handleDuplicate = useCallback((task) => {
+    const newId = duplicateTask(task)
+    flashHighlight(newId)
+  }, [duplicateTask, flashHighlight])
+
+  const handleTagClick = useCallback((tag) => {
+    setFilters((f) => ({ ...f, tag }))
+  }, [setFilters])
 
   useKeyboard({
     modalState, setModalState,
@@ -75,7 +84,7 @@ export default function App() {
     selectedIds, clearSelection, toggleOne, toggleAll, deleteSelected,
     deleteTask, duplicateTask, handleQuickUpdate,
     compact, setCompact,
-    setHighlightedTaskId,
+    flashHighlight,
     searchRef,
   })
 
@@ -120,13 +129,9 @@ export default function App() {
         onDeleteMany={deleteTasks}
         onAddTagToMany={addTagToTasks}
         onRemoveTagFromMany={removeTagFromTasks}
-        onTagClick={(tag) => setFilters((f) => ({ ...f, tag }))}
+        onTagClick={handleTagClick}
         onUpdate={handleQuickUpdate}
-        onDuplicate={(task) => {
-          const newId = duplicateTask(task)
-          setHighlightedTaskId(newId)
-          setTimeout(() => setHighlightedTaskId((cur) => (cur === newId ? null : cur)), HIGHLIGHT_DURATION_MS)
-        }}
+        onDuplicate={handleDuplicate}
         highlightedTaskId={highlightedTaskId}
         focusedTaskId={focusedTaskId}
         selection={{ selectedIds, clearSelection, toggleOne, toggleAll, deleteSelected, removeFromSelection }}

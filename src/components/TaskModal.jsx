@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { X, Plus } from 'lucide-react'
 import { tagColor } from '../utils/tags'
 import { STATUS, PRIORITY } from '../utils/constants'
+import { PRIORITY_ORDER, PRIORITY_LABEL, STATUS_ORDER, STATUS_LABEL } from '../utils/labels'
 import ModalBackdrop from './ModalBackdrop'
 
 const EMPTY_FORM = {
@@ -312,9 +313,9 @@ export default function TaskModal({ task, allTags, onSave, onClose }) {
                 onChange={set('priority')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="high">高</option>
-                <option value="medium">中</option>
-                <option value="low">低</option>
+                {PRIORITY_ORDER.map((p) => (
+                  <option key={p} value={p}>{PRIORITY_LABEL[p]}</option>
+                ))}
               </select>
             </div>
 
@@ -327,9 +328,9 @@ export default function TaskModal({ task, allTags, onSave, onClose }) {
                 onChange={set('status')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="todo">未着手</option>
-                <option value="in_progress">進行中</option>
-                <option value="done">完了</option>
+                {STATUS_ORDER.map((s) => (
+                  <option key={s} value={s}>{STATUS_LABEL[s]}</option>
+                ))}
               </select>
             </div>
           </div>

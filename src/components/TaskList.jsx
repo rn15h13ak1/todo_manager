@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { STATUS } from '../utils/constants'
 import { Trash2, Tag, X, LayoutList, AlignJustify, ChevronDown, ChevronRight } from 'lucide-react'
 import TaskCard from './TaskCard'
@@ -34,10 +34,15 @@ export default function TaskList({
     }
   }, [focusedTaskId, tasks])
 
-  function handleBulkTagApply(tag) {
+  const handleBulkTagApply = useCallback((tag) => {
     if (bulkTagMode === 'add') onAddTagToMany(selectedIds, tag)
     else onRemoveTagFromMany(selectedIds, tag)
-  }
+  }, [bulkTagMode, onAddTagToMany, onRemoveTagFromMany, selectedIds])
+
+  const handleDelete = useCallback((id) => {
+    onDelete(id)
+    removeFromSelection(id)
+  }, [onDelete, removeFromSelection])
 
   const activeTasks = tasks.filter((t) => t.status !== STATUS.DONE)
   const doneTasks = tasks.filter((t) => t.status === STATUS.DONE)
@@ -124,10 +129,7 @@ export default function TaskList({
                 selected={selectedIds.includes(task.id)}
                 onToggle={toggleOne}
                 onEdit={onEdit}
-                onDelete={(id) => {
-                  onDelete(id)
-                  removeFromSelection(id)
-                }}
+                onDelete={handleDelete}
                 onTagClick={onTagClick}
                 onUpdate={onUpdate}
                 onDuplicate={onDuplicate}
