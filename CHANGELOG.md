@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.37.0] - 2026-04-17
+
+### Changed
+- App.jsx のキーボードハンドラを `src/hooks/useKeyboard.js` カスタムフックに分離
+  - `moveFilterOption` 関数と `FILTER_COUNT` 定数をフック内に移動
+  - `c` キーハンドラのバグ修正（誤った第3引数を削除し `setConfirmToggle` を正しく呼び出すよう修正）
+  - App.jsx から約170行のキーボード処理コードを削減
+
 ## [1.36.1] - 2026-04-17
 
 ### Fixed
