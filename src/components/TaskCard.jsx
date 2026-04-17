@@ -3,22 +3,7 @@ import { Trash2, Copy } from 'lucide-react'
 import { tagColor } from '../utils/tags'
 import { formatRelativeDate, getTodayString } from '../utils/date'
 import { usePopover } from '../hooks/usePopover'
-
-const PRIORITY_BADGE = {
-  high: 'bg-red-100 text-red-700',
-  medium: 'bg-yellow-100 text-yellow-700',
-  low: 'bg-green-100 text-green-700',
-}
-const PRIORITY_LABEL = { high: '高', medium: '中', low: '低' }
-
-const STATUS_BADGE = {
-  todo: 'bg-gray-100 text-gray-600',
-  in_progress: 'bg-blue-100 text-blue-700',
-  done: 'bg-green-100 text-green-700',
-}
-const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完了' }
-const STATUS_ORDER = ['todo', 'in_progress', 'done']
-const PRIORITY_ORDER = ['high', 'medium', 'low']
+import { PRIORITY_LABEL, PRIORITY_BADGE, PRIORITY_ORDER, STATUS_LABEL, STATUS_BADGE, STATUS_ORDER } from '../utils/labels'
 
 export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onDuplicate, onTagClick, onUpdate, highlighted, focused, compact }) {
   const today = getTodayString()

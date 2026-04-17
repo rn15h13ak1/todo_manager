@@ -1,7 +1,5 @@
 import { generateTimestamp } from './date'
-
-const PRIORITY_LABEL = { high: '高', medium: '中', low: '低' }
-const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完了' }
+import { PRIORITY_LABEL, STATUS_LABEL } from './labels'
 
 function escapeHtml(str) {
   return String(str)

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.44.0] - 2026-04-17
+
+### Changed
+- `src/utils/labels.js` を新規作成し、ラベル・バッジ・表示順の定数を一元管理
+  - `PRIORITY_LABEL` / `STATUS_LABEL` / `PRIORITY_BADGE` / `STATUS_BADGE` / `PRIORITY_ORDER` / `STATUS_ORDER`
+- `TaskCard.jsx` と `exportHtml.js` のローカル定数を削除し `labels.js` から import するよう変更
+- `useTasks.js` の `PRIORITY_ORDER`（ソート重みマップ）を `PRIORITY_SORT_WEIGHT` に改名して `labels.js` の表示順配列と区別
+
 ## [1.43.0] - 2026-04-17
 
 ### Changed

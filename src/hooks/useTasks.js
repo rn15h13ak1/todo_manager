@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { loadTasks, saveTasks } from '../utils/storage'
 import { getTodayString } from '../utils/date'
 
-const PRIORITY_ORDER = { high: 1, medium: 2, low: 3 }
+// ソート用の重み（小さいほど優先度が高い）
+const PRIORITY_SORT_WEIGHT = { high: 1, medium: 2, low: 3 }
 
 export const INITIAL_FILTERS = {
   status: 'not_done',
@@ -130,7 +131,7 @@ export function useTasks() {
     }
 
     const byPriority = (a, b) =>
-      (PRIORITY_ORDER[a.priority] || 99) - (PRIORITY_ORDER[b.priority] || 99)
+      (PRIORITY_SORT_WEIGHT[a.priority] || 99) - (PRIORITY_SORT_WEIGHT[b.priority] || 99)
 
     return [...result].sort((a, b) => {
       if (sortKey === 'dueDate_asc') {
