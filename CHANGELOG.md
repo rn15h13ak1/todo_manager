@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.38.0] - 2026-04-17
+
+### Changed
+- `onStatusChange` / `onPriorityChange` / `onDueDateChange` / `onTitleChange` の4つの props を `onUpdate(id, patch)` 1つに統合
+  - App.jsx → TaskList → TaskCard の3層すべてで変更
+  - TaskList の props が23個→20個、TaskCard の props が14個→11個に削減
+
 ## [1.37.0] - 2026-04-17
 
 ### Changed

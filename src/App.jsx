@@ -115,10 +115,7 @@ export default function App() {
         onAddTagToMany={addTagToTasks}
         onRemoveTagFromMany={removeTagFromTasks}
         onTagClick={(tag) => setFilters((f) => ({ ...f, tag }))}
-        onStatusChange={(id, status) => handleQuickUpdate(id, { status })}
-        onPriorityChange={(id, priority) => handleQuickUpdate(id, { priority })}
-        onDueDateChange={(id, dueDate) => handleQuickUpdate(id, { dueDate })}
-        onTitleChange={(id, title) => handleQuickUpdate(id, { title })}
+        onUpdate={handleQuickUpdate}
         onDuplicate={(task) => {
           const newId = duplicateTask(task)
           setHighlightedTaskId(newId)

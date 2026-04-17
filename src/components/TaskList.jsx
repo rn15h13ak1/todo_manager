@@ -13,10 +13,7 @@ export default function TaskList({
   onAddTagToMany,
   onRemoveTagFromMany,
   onTagClick,
-  onStatusChange,
-  onPriorityChange,
-  onDueDateChange,
-  onTitleChange,
+  onUpdate,
   onDuplicate,
   highlightedTaskId,
   focusedTaskId,
@@ -187,10 +184,7 @@ export default function TaskList({
                   setSelectedIds((prev) => prev.filter((x) => x !== id))
                 }}
                 onTagClick={onTagClick}
-                onStatusChange={onStatusChange}
-                onPriorityChange={onPriorityChange}
-                onDueDateChange={onDueDateChange}
-                onTitleChange={onTitleChange}
+                onUpdate={onUpdate}
                 onDuplicate={onDuplicate}
                 highlighted={highlightedTaskId === task.id}
                 focused={focusedTaskId === task.id}
@@ -223,9 +217,7 @@ export default function TaskList({
                         setSelectedIds((prev) => prev.filter((x) => x !== id))
                       }}
                       onTagClick={onTagClick}
-                      onStatusChange={onStatusChange}
-                      onPriorityChange={onPriorityChange}
-                      onDueDateChange={onDueDateChange}
+                      onUpdate={onUpdate}
                       highlighted={highlightedTaskId === task.id}
                       focused={focusedTaskId === task.id}
                       compact={compact}

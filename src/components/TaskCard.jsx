@@ -19,7 +19,7 @@ const STATUS_LABEL = { todo: '未着手', in_progress: '進行中', done: '完�
 const STATUS_ORDER = ['todo', 'in_progress', 'done']
 const PRIORITY_ORDER = ['high', 'medium', 'low']
 
-export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onDuplicate, onTagClick, onStatusChange, onPriorityChange, onDueDateChange, onTitleChange, highlighted, focused, compact }) {
+export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, onDuplicate, onTagClick, onUpdate, highlighted, focused, compact }) {
   const _now = new Date()
   const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
   const isOverdue = task.dueDate && task.dueDate < today && task.status !== 'done'
@@ -149,7 +149,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                 if (e.key === 'Enter') {
                   e.stopPropagation()
                   const trimmed = titleDraft.trim()
-                  if (trimmed && trimmed !== task.title) onTitleChange?.(task.id, trimmed)
+                  if (trimmed && trimmed !== task.title) onUpdate?.(task.id, { title: trimmed })
                   setEditingTitle(false)
                 }
                 if (e.key === 'Escape') { e.stopPropagation(); setEditingTitle(false) }
@@ -157,7 +157,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
               onBlur={() => {
                 const trimmed = titleDraft.trim()
                 if (trimmed && trimmed !== task.title) {
-                  onTitleChange?.(task.id, trimmed)
+                  onUpdate?.(task.id, { title: trimmed })
                 }
                 setEditingTitle(false)
               }}
@@ -197,7 +197,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                       key={p}
                       onClick={(e) => {
                         e.stopPropagation()
-                        onPriorityChange?.(task.id, p)
+                        onUpdate?.(task.id, { priority: p })
                         setShowPriorityMenu(false)
                       }}
                       className={`w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors ${
@@ -228,7 +228,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                       key={s}
                       onClick={(e) => {
                         e.stopPropagation()
-                        onStatusChange?.(task.id, s)
+                        onUpdate?.(task.id, { status: s })
                         setShowStatusMenu(false)
                       }}
                       className={`w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors ${
@@ -294,7 +294,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                     onClick={(e) => {
                       e.stopPropagation()
                       const val = dueDateInputRef.current?.value || null
-                      onDueDateChange?.(task.id, val)
+                      onUpdate?.(task.id, { dueDate: val })
                       setShowDueDateMenu(false)
                     }}
                     className="flex-1 text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
@@ -305,7 +305,7 @@ export default function TaskCard({ task, selected, onToggle, onEdit, onDelete, o
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
-                        onDueDateChange?.(task.id, null)
+                        onUpdate?.(task.id, { dueDate: null })
                         setShowDueDateMenu(false)
                       }}
                       className="flex-1 text-xs text-red-500 border border-red-200 px-2 py-1 rounded hover:bg-red-50 transition-colors"
