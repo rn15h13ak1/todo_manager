@@ -34,6 +34,7 @@ export default function App() {
   // c キーの完了トグル確認: null | { id, title, newStatus }
   const [confirmToggle, setConfirmToggle] = useState(null)
 
+  const [compact, setCompact] = useState(false)
   const [highlightedTaskId, setHighlightedTaskId] = useState(null)
   const [focusedTaskId, setFocusedTaskId] = useState(null)
   const [selectionCount, setSelectionCount] = useState(0)
@@ -133,6 +134,13 @@ export default function App() {
         return
       }
 
+      // v: コンパクト / 通常表示を切り替え
+      if (e.key === 'v') {
+        e.preventDefault()
+        setCompact((c) => !c)
+        return
+      }
+
       // n: タスク追加モーダルを開く
       if (e.key === 'n') {
         e.preventDefault()
@@ -204,7 +212,7 @@ export default function App() {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [modalState, showShortcutModal, confirmToggle, isFiltered, resetFilters, focusedTaskId, filteredTasks, selectionCount, deleteTask,
-      filterFocusIndex, filters, sortKey, allTags])
+      filterFocusIndex, filters, sortKey, allTags, compact])
 
   function handleSave(formData) {
     if (modalState.task) {
@@ -239,6 +247,8 @@ export default function App() {
       <TaskList
         tasks={filteredTasks}
         allTasks={tasks}
+        compact={compact}
+        onToggleCompact={() => setCompact((c) => !c)}
         allTags={allTags}
         onEdit={(task) => setModalState({ task })}
         onDelete={deleteTask}

@@ -4,6 +4,7 @@ export default function ShortcutModal({ onClose }) {
       title: '全般',
       shortcuts: [
         { key: 'n', desc: 'タスク追加モーダルを開く' },
+        { key: 'v', desc: 'コンパクト / 通常表示を切り替え' },
         { key: '/', desc: '検索欄にフォーカス（Esc または Enter で解除 → j/k 操作に戻る）' },
         { key: '?', desc: 'このショートカット一覧を表示' },
         { key: 'Esc', desc: 'フィルターフォーカス解除 → タスクフォーカス解除 → 選択解除 → フィルターリセット' },

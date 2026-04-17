@@ -24,10 +24,11 @@ export default function TaskList({
   onRegisterClearSelection,
   onRegisterToggleOne,
   onRegisterDeleteSelected,
+  compact,
+  onToggleCompact,
 }) {
   const [selectedIds, setSelectedIds] = useState([])
   const [bulkTagMode, setBulkTagMode] = useState(null) // null | 'add' | 'remove'
-  const [compact, setCompact] = useState(false)
   const [archiveOpen, setArchiveOpen] = useState(false)
 
   // フォーカスが完了タスクに移動したとき、折りたたみを自動展開する
@@ -107,7 +108,7 @@ export default function TaskList({
           <div className="flex items-center justify-between mb-3 px-1 flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setCompact((v) => !v)}
+                onClick={onToggleCompact}
                 className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 border border-gray-300 hover:border-gray-400 rounded-md px-2 py-1 transition-colors"
                 title={compact ? '通常表示に切り替え' : 'コンパクト表示に切り替え'}
               >
