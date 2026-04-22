@@ -95,6 +95,15 @@ export default function TaskPanel({ task, allTags, onSave, onClose, shouldFocus 
     }
   }
 
+  // フォーカスがパネル外へ移動したとき編集内容を確定する
+  function handleContainerBlur(e) {
+    if (mode !== 'edit') return
+    if (containerRef.current?.contains(e.relatedTarget)) return
+    editSnapshotRef.current = null
+    if (form.title.trim()) onSave?.(form)
+    setMode('nav')
+  }
+
   function rowClass(idx) {
     if (!isActive || navIndex !== idx) return ''
     return mode === 'edit'
@@ -212,6 +221,7 @@ export default function TaskPanel({ task, allTags, onSave, onClose, shouldFocus 
       ref={containerRef}
       tabIndex={-1}
       onKeyDown={handleKeyDown}
+      onBlur={handleContainerBlur}
       className="h-full flex flex-col bg-white focus:outline-none"
     >
       {/* ヒントバー */}
