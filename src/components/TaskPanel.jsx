@@ -80,7 +80,7 @@ export default function TaskPanel({ task, allTags, onSave, onClose, shouldFocus 
   // ── ナビゲーション ──
 
   function rowClass(idx) {
-    if (navIndex !== idx) return ''
+    if (!isActive || navIndex !== idx) return ''
     return mode === 'edit'
       ? 'bg-green-50 ring-1 ring-inset ring-green-200 rounded-lg'
       : 'bg-blue-50 ring-1 ring-inset ring-blue-200 rounded-lg'
