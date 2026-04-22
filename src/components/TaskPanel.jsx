@@ -79,6 +79,18 @@ export default function TaskPanel({ task, allTags, onSave, onClose, shouldFocus 
 
   // ── ナビゲーション ──
 
+  // フィールドへの直接クリック・フォーカス時に navIndex と mode を同期する
+  function handleFormFocus(e) {
+    const navEl = e.target.closest('[data-nav]')
+    if (!navEl) return
+    const idx = parseInt(navEl.dataset.nav, 10)
+    if (!isNaN(idx)) {
+      if (navIndex !== idx) editSnapshotRef.current = { form: { ...form }, tagInput }
+      setNavIndex(idx)
+      setMode('edit')
+    }
+  }
+
   function rowClass(idx) {
     if (!isActive || navIndex !== idx) return ''
     return mode === 'edit'
@@ -218,7 +230,7 @@ export default function TaskPanel({ task, allTags, onSave, onClose, shouldFocus 
       )}
 
       {/* フォーム（スクロール可） */}
-      <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-3 overflow-y-auto flex-1">
+      <form onSubmit={handleSubmit} onFocus={handleFormFocus} className="px-6 py-5 flex flex-col gap-3 overflow-y-auto flex-1">
 
         {/* 0: タイトル */}
         <div data-navrow="0" className={`-mx-2 px-2 py-1.5 transition-colors ${rowClass(0)}`}>
