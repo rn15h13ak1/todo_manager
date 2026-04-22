@@ -74,6 +74,9 @@ export function useKeyboard({
     }
 
     function handleKeyDown(e) {
+      // Tab: ブラウザのフォーカス移動をアプリ全体で無効化
+      if (e.key === 'Tab') { e.preventDefault(); return }
+
       const tag = document.activeElement?.tagName
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
 
