@@ -85,7 +85,11 @@ export default function TaskPanel({ task, allTags, onSave, onClose, shouldFocus 
     if (!navEl) return
     const idx = parseInt(navEl.dataset.nav, 10)
     if (!isNaN(idx)) {
-      if (navIndex !== idx) editSnapshotRef.current = { form: { ...form }, tagInput }
+      if (navIndex !== idx) {
+        // 別フィールドへ移動: 編集中なら現在の内容を確定してから切り替え
+        if (mode === 'edit' && form.title.trim()) onSave?.(form)
+        editSnapshotRef.current = { form: { ...form }, tagInput }
+      }
       setNavIndex(idx)
       setMode('edit')
     }
