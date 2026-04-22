@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { STATUS, PRIORITY, FILTER_STATUS, SORT_KEY, FILTER_COUNT } from '../utils/constants'
 import { deleteConfirmMessage } from '../utils/messages'
+import { saveCompact } from '../utils/storage'
 
 /**
  * アプリ全体のキーボードショートカットを管理するフック。
@@ -161,7 +162,7 @@ export function useKeyboard({
       // v: コンパクト / 通常表示を切り替え
       if (e.key === 'v') {
         e.preventDefault()
-        setCompact((c) => !c)
+        setCompact((c) => { saveCompact(!c); return !c })
         return
       }
 
