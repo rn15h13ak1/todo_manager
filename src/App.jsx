@@ -13,6 +13,7 @@ import { useSelection } from './hooks/useSelection'
 import { useHighlight } from './hooks/useHighlight'
 import { STATUS, PRIORITY } from './utils/constants'
 import LeftPanelIndicator from './components/LeftPanelIndicator'
+import { loadCompact, saveCompact } from './utils/storage'
 
 export default function App() {
   const {
@@ -44,7 +45,7 @@ export default function App() {
   // t/T キーのタグ操作: null | { mode: 'add'|'remove', taskIds: string[], currentTags: string[] }
   const [tagModalState, setTagModalState] = useState(null)
 
-  const [compact, setCompact] = useState(false)
+  const [compact, setCompact] = useState(() => loadCompact())
   const { highlightedTaskId, flashHighlight } = useHighlight()
   const [focusedTaskId, setFocusedTaskId] = useState(null)
   const searchRef = useRef(null)
@@ -160,7 +161,7 @@ export default function App() {
   const handleSearchFocus    = useCallback(() => setIsSearchFocused(true), [])
   const handleSearchBlur     = useCallback(() => setIsSearchFocused(false), [])
   const handleSearchConfirm  = useCallback(() => { setIsSearchFocused(false); leftPanelRef.current?.focus() }, [])
-  const handleToggleCompact  = useCallback(() => setCompact((c) => !c), [])
+  const handleToggleCompact  = useCallback(() => setCompact((c) => { saveCompact(!c); return !c }), [])
   const handleEditTask       = useCallback((task) => setPanelState({ task }), [])
   const handleFocusLeft      = useCallback(() => leftPanelRef.current?.focus(), [])
   const handlePanelFocus     = useCallback(() => setIsPanelFocused(true), [])
